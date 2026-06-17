@@ -39,16 +39,21 @@ The platform is designed to handle complex file structures and secure access via
 
 ## 📸 Screenshots
 
-*(Replace the placeholder URLs with links to your actual repository images)*
+
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400.png?text=Dashboard+Preview+Here" alt="CloudVault Dashboard UI" width="800"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20173451.png" alt="CloudVault Dashboard UI" width="800"/>
   <p><i>The main dashboard featuring a premium glassmorphism UI.</i></p>
 </div>
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px;">
-  <img src="https://via.placeholder.com/400x250.png?text=OAuth+Login+Screen" alt="Login Screen" width="390"/>
-  <img src="https://via.placeholder.com/400x250.png?text=Google+Picker+Integration" alt="File Picker API" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20173141.png" alt="Login Screen" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20221142.png" alt="File Picker API" width="390"/>
+   <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20173847.png" alt="File Picker API" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20173753.png" alt="File Picker API" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20173618.png" alt="File Picker API" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20174120.png" alt="File Picker API" width="390"/>
+  <img src="https://github.com/yogeshsshekhawat/Storage-App/blob/master/images/Screenshot%202026-06-17%20180116.png" alt="File Picker API" width="390"/>
 </div>
 
 ---
