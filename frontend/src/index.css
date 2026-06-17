@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+
+*{
+    font-family: "Plus Jakarta Sans", sans-serif;
+  font-optical-sizing: auto;
+  
+}
+.hide-scrollbar {
+  overflow: auto;              /* or scroll */
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;               /* Chrome, Safari */
+}
+.folderSwiper .swiper-scrollbar {
+  display: none !important;
+}
