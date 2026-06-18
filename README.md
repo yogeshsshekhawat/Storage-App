@@ -33,7 +33,7 @@ The platform is designed to handle complex file structures and secure access via
   - [Installation](#installation)
   - [Environment Variables](#environment-variables)
 - [Usage](#-usage)
-- [License](#-license)
+
 
 ---
 
