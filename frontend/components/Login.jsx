@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { GoogleLogin } from "@react-oauth/google";
 
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -135,7 +135,7 @@ export default function Login() {
         }
       `}</style>
 
-      <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAFAFA] relative overflow-hidden">
+      <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAFAFA] relative overflow-hidden font-sans">
         {/* Background animated orbs */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {/* Orb 1 */}

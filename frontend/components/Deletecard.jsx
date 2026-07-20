@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 
 const Deletecard = ({ el, getdata, active }) => {
-  const url = "http://localhost:3000/";
+  const url = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "") + "/";
   const [deletemenu, setdeletemenu] = useState(false);
   const [restoremenu, setrestoremenu] = useState(false);
   function timeAgo(date) {
@@ -113,263 +113,216 @@ const Deletecard = ({ el, getdata, active }) => {
     getdata(active);
   }
   return (
-    <div className="w-full h-12  border-t border-[#a3a3a3] flex ">
-      <div className="w-[25vw] h-full   text-[14px] flex items-center pl-4 gap-2">
-        <div className="w-7 h-7  flex items-center justify-center rounded ">
-          {fileIcons[el.ext]}
+    <div className="w-full h-12.5 flex items-center hover:bg-gray-50/60 transition-colors border-b border-gray-100 last:border-b-0">
+      {/* File Name */}
+      <div className="w-[32%] pl-6 flex items-center gap-3 text-xs font-semibold text-gray-700 truncate">
+        <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-150 flex-shrink-0 text-base shadow-sm">
+          {fileIcons[el.ext] || "📁"}
         </div>
-        {el.name}
+        <span className="truncate" title={el.name}>
+          {el.name}
+        </span>
       </div>
-      <div className="w-[18vw] h-full   text-[12px] flex items-center justify-center capitalize ">
-        📁 &nbsp; /
-        {Array.isArray(el?.path) ? el.path.map((word) => word).join(" / ") : ""}
+
+      {/* Original Location */}
+      <div className="w-[25%] flex items-center justify-center text-[11px] font-semibold text-gray-400 capitalize truncate px-2">
+        <span className="truncate">
+          📁 &nbsp;/&nbsp;
+          {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
+        </span>
       </div>
-      <div className="w-[15vw] h-full   text-[14px] flex items-center justify-center">
+
+      {/* Deleted Time */}
+      <div className="w-[18%] flex items-center justify-center text-xs text-gray-500 font-medium">
         {timeAgo(el.updatedAt)}
       </div>
-      <div className="w-[10vw] h-full   text-[14px] flex items-center justify-center">
+
+      {/* File Size */}
+      <div className="w-[12%] flex items-center justify-center text-xs text-gray-500 font-medium">
         {formatSize(el.size)}
       </div>
-      <div className="w-[15vw] h-full   text-[14px] flex items-center justify-center gap-3">
-        <div
-          className="w-9 h-9 rounded  cursor-pointer flex items-center justify-center"
-          onClick={() => {
-            setrestoremenu(true);
-          }}
+
+      {/* Actions */}
+      <div className="w-[13%] flex items-center justify-end pr-6 gap-3">
+        {/* Restore Action */}
+        <button
+          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-blue-50 border border-blue-100 hover:bg-blue-100 hover:text-blue-700 text-blue-600 transition-colors shadow-sm"
+          onClick={() => setrestoremenu(true)}
+          title="Restore File"
         >
           <svg
-            className="w-6 h-6 text-[#4A90E2]"
+            className="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            strokeWidth="2.2"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
             />
           </svg>
-        </div>
-        <div
-          className="w-9 h-9 rounded  cursor-pointer flex items-center justify-center"
-          onClick={() => {
-            setdeletemenu(true);
-          }}
+        </button>
+
+        {/* Permanent Delete Action */}
+        <button
+          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-red-50 border border-red-100 hover:bg-red-100 hover:text-red-700 text-red-500 transition-colors shadow-sm"
+          onClick={() => setdeletemenu(true)}
+          title="Delete Forever"
         >
-          {" "}
           <svg
-            width="22"
-            height="22"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="red"
-            stroke-width="1.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <path d="M3 6h18"></path>
             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>{" "}
-        </div>
+          </svg>
+        </button>
       </div>
-      <div
-        className={`deletemenu w-screen h-screen z-100 bg-[#1010104e] backdrop-blur-[2px] absolute top-0 left-0 ${deletemenu ? "flex" : "hidden"} items-center justify-center`}
-        onClick={() => {
-          setdeletemenu(false);
-        }}
-      >
+
+      {/* Delete Forever Modal */}
+      {deletemenu && (
         <div
-          className="w-[30vw] h-50 bg-white rounded-xl p-5 border border-[#c0bdbd] "
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className="deletemenu fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setdeletemenu(false)}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex gap-3 items-center">
-              <svg
-                className="w-8 h-8 text-[#FF6B6B]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div
+            className="w-full max-w-[360px] bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-4 animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2.5 items-center">
+                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-base shadow-sm">
+                  ⚠️
+                </div>
+                <h1 className="font-bold text-sm text-gray-800">Delete Forever?</h1>
+              </div>
+              <button
+                className="w-7 h-7 bg-gray-50 border border-gray-150 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 text-gray-400 transition-all"
+                onClick={() => setdeletemenu(false)}
               >
-                <path
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-              <h1 className="font-bold text-[#FF6B6B]">Delete Forever?</h1>
+                >
+                  <path d="M18 6 6 18"></path>
+                  <path d="M6 6l12 12"></path>
+                </svg>
+              </button>
             </div>
 
-            <div
-              className="w-9 h-9 bg-[#dbdada] rounded-xl flex items-center justify-center cursor-pointer"
-              onClick={() => {
-                setdeletemenu(false);
-              }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M18 6 6 18"></path>
-                <path d="M6 6l12 12"></path>
-              </svg>
+            <div className="flex flex-col gap-1">
+              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+                Are you sure you want to permanently delete this file?
+              </p>
+              <div className="bg-gray-50 border border-gray-150 p-2.5 rounded-lg text-xs font-bold text-gray-700 truncate max-w-full">
+                {el.name}
+              </div>
+              <p className="text-[11px] font-extrabold text-red-500 tracking-wide uppercase mt-1">
+                This action is destructive and cannot be undone!
+              </p>
             </div>
-          </div>
-          <p className="text-[13px] mt-4  ">
-            Are you sure you want to permanently delete
-          </p>
-          <span className="font-bold text-[12px] max-w-96   h-4 text-ellipsis  inline-block   overflow-hidden">
-            {" "}
-            {el.name}
-          </span>
-          <p className="text-[12px] font-semibold text-[#FF6B6B]">
-            This action cannot be undone!
-          </p>
 
-          <div className="w-full h-16  flex items-center justify-end gap-4">
-            <div
-              className="text-[12px] w-16 h-10 border border-[#c0bdbd] hover:bg-[#bebdbd] transition-colors font-semibold flex items-center justify-center rounded-xl cursor-pointer"
-              onClick={(e) => {
-                setdeletemenu(false);
-              }}
-            >
-              Cancel
-            </div>
-            <div
-              className="text-[12px] w-24 h-10 border border-[#e6a5a5]  bg-rose-50  hover:bg-rose-100 transition-colors flex items-center justify-center text-[red] rounded-xl cursor-pointer font-semibold gap-2"
-              onClick={() => {
-                handledelete(el._id, el.name, "permanentdelete");
-              }}
-            >
-              {" "}
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+            <div className="flex gap-3 justify-end mt-2">
+              <button
+                className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                onClick={() => setdeletemenu(false)}
               >
-                <path d="M3 6h18"></path>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              Delete
+                Cancel
+              </button>
+              <button
+                className="text-xs px-5 py-2 bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                onClick={() => handledelete(el._id, el.name, "permanentdelete")}
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
-      </div>
-      <div
-        className={`restoremenu w-screen h-screen z-100 bg-[#1010104e] backdrop-blur-[2px] absolute top-0 left-0 ${restoremenu ? "flex" : "hidden"} items-center justify-center`}
-        onClick={() => {
-          setrestoremenu(false);
-        }}
-      >
+      )}
+
+      {/* Restore File Modal */}
+      {restoremenu && (
         <div
-          className="w-[30vw] h-50 bg-white rounded-xl p-5 border border-[#c0bdbd] "
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          className="restoremenu fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setrestoremenu(false)}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex gap-3 items-center">
-              <svg
-                className="w-6 h-6 text-[#4A90E2]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div
+            className="w-full max-w-[360px] bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-4 animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2.5 items-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 text-base shadow-sm">
+                  🔄
+                </div>
+                <h1 className="font-bold text-sm text-gray-800">Restore File?</h1>
+              </div>
+              <button
+                className="w-7 h-7 bg-gray-50 border border-gray-150 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 text-gray-400 transition-all"
+                onClick={() => setrestoremenu(false)}
               >
-                <path
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <h1 className="font-bold text-[#3466c3]">Restore File</h1>
+                >
+                  <path d="M18 6 6 18"></path>
+                  <path d="M6 6l12 12"></path>
+                </svg>
+              </button>
             </div>
 
-            <div
-              className="w-9 h-9 bg-[#dbdada] rounded-xl flex items-center justify-center cursor-pointer"
-              onClick={() => {
-                setrestoremenu(false);
-              }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M18 6 6 18"></path>
-                <path d="M6 6l12 12"></path>
-              </svg>
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+                Restore this file back to its original directory path?
+              </p>
+              <div className="bg-gray-50 border border-gray-150 p-2.5 rounded-lg text-xs font-bold text-gray-700 truncate max-w-full">
+                {el.name}
+              </div>
+              <div className="text-[11px] font-semibold text-gray-450 flex items-center gap-1">
+                <span>Location:</span>
+                <span className="font-extrabold text-gray-700 capitalize">
+                  📁 / {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
+                </span>
+              </div>
             </div>
-          </div>
-          <p className="text-[13px] mt-4  ">
-            Are you sure you want to restore
-            <span className="font-bold text-[12px] w-96  h-4 text-ellipsis  inline-block   overflow-hidden">
-              {" "}
-              {el.name}
-            </span>
-          </p>
-          <p className="text-[13px] capitalize ">
-            It will be restored to:📁{" "}
-            <p className="inline-block font-bold ">
-              /
-              {Array.isArray(el?.path)
-                ? el.path.map((word) => word).join(" / ")
-                : ""}
-            </p>
-          </p>
 
-          <div className="w-full h-16  flex items-center justify-end gap-4">
-            <div
-              className="text-[12px] w-16 h-10 border border-[#c0bdbd] hover:bg-[#bebdbd] transition-colors font-semibold flex items-center justify-center rounded-xl cursor-pointer"
-              onClick={(e) => {
-                setrestoremenu(false);
-              }}
-            >
-              Cancel
-            </div>
-            <div
-              className="text-[12px] w-24 h-10 border border-[#8abfcf]  bg-blue-50  hover:bg-blue-100 transition-colors flex items-center justify-center text-[#3b64e0] rounded-xl cursor-pointer font-semibold gap-2"
-              onClick={() => {
-                handlerestore(el._id,'restore');
-              }}
-            >
-              <svg
-                className="w-4 h-4 text-[#3466c3]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex gap-3 justify-end mt-2">
+              <button
+                className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                onClick={() => setrestoremenu(false)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Restore
+                Cancel
+              </button>
+              <button
+                className="text-xs px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                onClick={() => handlerestore(el._id, "restore")}
+              >
+                Restore
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -88,8 +88,9 @@ const Dashfcard = ({
 
     return "just now";
   }
+  const url = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "") + "/";
   function handleopen(name) {
-    window.location.href = `http://localhost:3000/file/${id}${ext}?name=${name}`;
+    window.location.href = `${url}file/${id}${ext}?name=${name}`;
   }
   return (
     <div className="w-full h-12  border-b border-[#b1b1b1]  select-none hover:bg-[#EBEAEA]" onDoubleClick={() => {

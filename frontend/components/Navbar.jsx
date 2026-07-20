@@ -1,124 +1,237 @@
-import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
+import { useState, useEffect, useRef } from "react";
+import {
+  FiSearch,
+  FiUser,
+  FiSettings,
+  FiLogOut,
+  FiPieChart
+} from "react-icons/fi";
+import Filecard from "./Filecard";
+import Foldercard from "./Foldercard";
 
+const Navbar = ({ data, getdata, url, setActive }) => {
+  const [profilemenu, setprofiloemenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchContainerRef = useRef(null);
 
-const Navbar = ({data,getdata,url}) => {
-  const [profilemenu,setprofiloemenu] = useState(false)
-  async function handlelogout(){
-    const response = await fetch(`${url}user/logout`,{
-      method:"POST",
-      credentials:"include"
-    })
-    getdata()
+  async function handlelogout() {
+    try {
+      await fetch(`${url}user/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      getdata();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   }
+
+  const performSearch = async (query) => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`${url}file/search?q=${encodeURIComponent(query)}`, {
+        credentials: "include",
+      });
+      if (res.ok) {
+        const searchData = await res.json();
+        setResults(searchData);
+      } else {
+        console.error("Search failed");
+      }
+    } catch (error) {
+      console.error("Error searching files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    setShowDropdown(true);
+    const delayDebounceFn = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 600);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (event.target.closest(".card-portal")) {
+        return;
+      }
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleResultAction = (activeTab) => {
+    if (getdata) getdata(activeTab);
+    performSearch(searchQuery);
+  };
 
   return (
     <>
-      <div className="w-full h-16  border-b border-[#EBEAEA] flex items-center justify-between pl-5 pr-5">
-        <div className="relative w-[40vw] h-full  flex items-center">
-          <svg
-            className="absolute top-5.5 left-3 "
-            width="26"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="black"
-            stroke-width="1.9"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            s
-          >
-            <path d="M11 11m-7 0a7 7 0 1 0 14 0 7 7 0 1 0-14 0"></path>
-            <path d="M21 21l-4.35-4.35"></path>
-          </svg>
+      <div className="w-full h-16  border-b border-[#EBEAEA] bg-white/70 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-20">
+        {/* Responsive Search Input Container */}
+        <div ref={searchContainerRef} className="relative w-full max-w-2xl flex items-center">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 pointer-events-none">
+            <FiSearch className="text-sm" />
+          </span>
           <input
             type="text"
-            placeholder="Search Files..."
-            className="w-full h-[70%] pl-10 pr-3 py-2 border border-[#acacac]  rounded-lg outline-none bg-[#F4F3F3] text-[14px]"
+            placeholder="Search files, folders..."
+            className="w-full h-9.5 pl-10 pr-4 py-2 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl outline-none bg-gray-50/50 hover:bg-gray-50 focus:bg-white text-xs font-semibold text-gray-700 transition-all focus:border-[#4A4D4A] focus:ring-[3.5px]"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => {
+              if (searchQuery.trim()) {
+                setShowDropdown(true);
+              }
+            }}
           />
-        </div>
-        
-          
-          <div className="profile w-10 h-10  rounded-full bg-[#606360] cursor-pointer flex items-center justify-center text-[13px] text-white overflow-hidden" onClick={()=>{
-          setprofiloemenu(true)
-        }}>
-          
-          <img src={data?.profilepic} className="w-full h-full" alt="profileimg"></img>
+          {showDropdown && (
+            <div className="absolute top-11 left-0 w-full max-h-[320px] overflow-y-auto bg-white border border-gray-200/80 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.12)] backdrop-blur-md z-50 flex flex-col hide-scrollbar p-1.5 gap-0.5">
+              {loading ? (
+                <div className="p-4 text-center text-gray-400 text-xs font-semibold">Searching...</div>
+              ) : results.length > 0 ? (
+                results.map((item) => {
+                  if (item.type === "directory") {
+                    return (
+                      <Foldercard
+                        key={item._id}
+                        id={item._id}
+                        name={item.name}
+                        getdata={handleResultAction}
+                        compact={true}
+                      />
+                    );
+                  } else {
+                    return (
+                      <Filecard
+                        key={item._id}
+                        id={item._id}
+                        name={item.name}
+                        ext={item.ext}
+                        modifed={item.updatedAt}
+                        size={item.size}
+                        favorites={item.favorites}
+                        getdata={handleResultAction}
+                        active="search"
+                        compact={true}
+                      />
+                    );
+                  }
+                })
+              ) : (
+                <div className="p-4 text-center text-gray-400 text-xs font-semibold">No files found</div>
+              )}
+            </div>
+          )}
         </div>
 
-        
-        
-      </div>
-      <div className={`profilemenu ${profilemenu?"block":"hidden"} w-screen h-screen  z-2 absolute top-0 left-0`}  onClick={()=>{
-          setprofiloemenu(false)
-        }}>
-        <div className="menu w-56 h-64  absolute top-14 right-10 bg-white border  border-[#acacac] shadow-[0_3px_10px_rgb(0,0,0,0.2)] rounded-2xl overflow-hidden" onClick={(e)=>{
-          e.stopPropagation()
-        }}>
-          <div className="userdata w-full h-18  flex items-center bg-[#F4F3F3] justify-evenly border-b border-[#acacac] ">
-            <div className="">
-              <h1 className="text-[12px] font-bold">{data?.username}</h1>
-              <h1 className="text-[9px] ">{data?.useremail}</h1>
-            </div>
-            <div className="profile w-10 h-10 rounded-full bg-[#606360]  flex items-center justify-center text-[13px] text-white overflow-hidden">
-              <img src={data?.profilepic} className="w-full h-full" alt="profileimg"></img>
-            </div>
+        {/* User Profile Avatar Icon */}
+        <div className="relative">
+          <div
+            className="profile w-8.5 h-8.5 rounded-full bg-gray-500 cursor-pointer flex items-center justify-center text-xs text-white overflow-hidden border border-gray-200 hover:border-gray-400 transition-all shadow-sm"
+            onClick={() => setprofiloemenu(!profilemenu)}
+          >
+            <img
+              src={data?.profilepic}
+              className="w-full h-full object-cover"
+              alt="profile"
+              onError={(e) => { e.target.src = "https://www.gravatar.com/avatar/?d=mp"; }}
+            />
           </div>
-          <div className="h-32 border-b border-[#acacac]">
-            <div className="w-full h-10 flex items-center p-2  hover:bg-[#EBEAEA] transition-colors cursor-pointer text-[13px] gap-2">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+
+          {/* Upgraded Profile Settings Card */}
+          {profilemenu && (
+            <>
+              {/* Overlay click catcher */}
+              <div className="fixed inset-0 z-30" onClick={() => setprofiloemenu(false)}></div>
+
+              <div
+                className="menu w-56 absolute top-11 right-0 bg-white border border-gray-200 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.15)] rounded-2xl p-1.5 flex flex-col gap-0.5 z-40 animate-slide-up"
+                onClick={(e) => e.stopPropagation()}
               >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
-              </svg>
-              My profile
-            </div>
-            <div className="w-full  gap-2 h-10 flex items-center p-2  hover:bg-[#EBEAEA] transition-colors cursor-pointer text-[13px]">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
-              Settings
-            </div>
-            <div className="w-full h-10  gap-2 flex items-center p-2  hover:bg-[#EBEAEA] transition-colors cursor-pointer text-[13px]">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
-                <path d="M12 16v-4"></path>
-                <path d="M12 8h.01"></path>
-              </svg>
-              Storage plan
-            </div>
-          </div>
-          <div className="w-full h-13.5  flex bg-rose-50 items-center gap-2 p-2 hover:bg-[#eccfcf] transition-colors cursor-pointer text-[15px] text-[red]" onClick={handlelogout}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
-            Sign Out
-          </div>
+                {/* User metadata header */}
+                <div className="userdata w-full p-3 flex items-center gap-3 bg-gray-50 border border-gray-150 rounded-xl shrink-0">
+                  <div className="profile w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-xs text-white overflow-hidden shrink-0">
+                    <img
+                      src={data?.profilepic}
+                      className="w-full h-full object-cover"
+                      alt="profile"
+                      onError={(e) => { e.target.src = "https://www.gravatar.com/avatar/?d=mp"; }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-[11px] font-extrabold text-gray-800 truncate leading-none mb-0.5">{data?.username}</h1>
+                    <h1 className="text-[9px] text-gray-400 font-semibold truncate leading-none">{data?.useremail}</h1>
+                  </div>
+                </div>
+
+                {/* Option links */}
+                <div className="flex flex-col gap-0.5 py-1">
+                  <div
+                    onClick={() => {
+                      if (setActive) setActive("Settings");
+                      setprofiloemenu(false);
+                    }}
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                  >
+                    <FiUser className="text-gray-400 text-xs shrink-0" />
+                    My profile
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (setActive) setActive("Settings");
+                      setprofiloemenu(false);
+                    }}
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                  >
+                    <FiSettings className="text-gray-400 text-xs shrink-0" />
+                    Settings
+                  </div>
+                  <div
+                    onClick={() => {
+                      if (setActive) setActive("Settings");
+                      setprofiloemenu(false);
+                    }}
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                  >
+                    <FiPieChart className="text-gray-400 text-xs shrink-0" />
+                    Storage plan
+                  </div>
+                </div>
+
+                {/* Sign Out Action Button */}
+                <button
+                  className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-extrabold text-red-500 hover:bg-red-50 active:bg-red-100 rounded-xl transition-all cursor-pointer border-none bg-transparent"
+                  onClick={handlelogout}
+                >
+                  <FiLogOut className="text-red-400 text-xs shrink-0" />
+                  Sign Out
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

@@ -1,213 +1,202 @@
 import React, { useEffect, useState } from "react";
-import { IoMdAdd } from "react-icons/io";
-import { LuUpload } from "react-icons/lu";
-import Foldercard from "./Foldercard";
-import { FaFolder } from "react-icons/fa6";
-import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
-import { CiFileOn } from "react-icons/ci";
-import { Swiper, SwiperSlide } from "swiper/react";
-
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
+import { FiFolder, FiStar, FiFileText, FiLink, FiFolderPlus, FiDatabase } from "react-icons/fi";
 import Filecard from "./Filecard";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import Dashfcard from "./Dashfcard";
 
 const Dashboard = ({ url, data, getdata, active, setActive }) => {
-  const [swiperInstance, setSwiperInstance] = useState(null);
-  const [folderoptionmenu, setfolderoptionmenu] = useState(false);
-  const [folderrename, setfolderrename] = useState(false);
-  const [newfolder, setnewfolder] = useState(true);
-  const [screen, setscreen] = useState(true);
   const [foldername, setfoldername] = useState("");
-  const [oldfoldername, setoldfoldername] = useState();
-  const [newfoldername, setnewfoldername] = useState(oldfoldername);
-  const [folderid, setfolderid] = useState();
   const folders = data?.folder || [];
   const files = data?.files || [];
   const favorite = data?.favorites || [];
   const { dirId } = useParams();
-  useEffect(() => {
-    setnewfoldername(oldfoldername);
-  }, [oldfoldername]);
 
+  const totalFilesCount = data?.totalFiles || 0;
+  const totalFoldersCount = data?.totalFolders || 0;
+  const totalSize = data?.totalSize || 0;
+  const storageLimitBytes = data?.storageLimit || (200 * 1024 * 1024);
 
-
-  let enableSwipe = folders.length >= 5;
-  async function handleupload(file) {
-    const res = await fetch(`${url}file/${file.name}`, {
-      method: "POST",
-      body: file,
-      credentials: "include",
-      headers: { dirid: dirId || "root", size: file.size },
-    });
-    const data = await res.json();
-
-    getdata();
-  }
-  async function handlecreate() {
-    const res = await fetch(`${url}directory/${dirId || "root"}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        foldername: foldername,
-      }),
-    });
-    setfoldername("");
-    getdata();
-    setnewfolder(true);
-  }
-
-  useEffect(() => {
-    if (folders.length === 0) {
-      setscreen(false);
-    } else {
-      setscreen(true);
+  const formatBytes = (bytes) => {
+    if (bytes === undefined || bytes === null || isNaN(bytes)) bytes = 0;
+    if (bytes >= 1024 * 1024 * 1024 * 1024) {
+      return (bytes / (1024 * 1024 * 1024 * 1024)).toFixed(1) + " TB";
     }
-  }, [folders]);
+    if (bytes >= 1024 * 1024 * 1024) {
+      return (bytes / (1024 * 1024 * 1024)).toFixed(1) + " GB";
+    }
+    if (bytes >= 1024 * 1024) {
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+    return (bytes / 1024).toFixed(1) + " KB";
+  };
 
-  async function handlefolderrename() {
-    const res = await fetch(`${url}directory/${folderid}`, {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        newfoldername: newfoldername,
-      }),
-    });
-    setfolderrename(false);
-    getdata();
-  }
+  let docSize = 0;
+  let imgSize = 0;
+  let vidSize = 0;
+  let otherSize = 0;
+
+  const docExtensions = ["pdf", "docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "csv", "md", "json", "rtf"];
+  const imgExtensions = ["png", "jpg", "jpeg", "gif", "webp", "svg", "bmp", "ico"];
+  const vidExtensions = ["mp4", "webm", "mkv", "avi", "mov", "wmv"];
+
+  files.forEach((f) => {
+    const extension = f.ext ? f.ext.toLowerCase().replace(".", "") : "";
+    if (docExtensions.includes(extension)) {
+      docSize += f.size || 0;
+    } else if (imgExtensions.includes(extension)) {
+      imgSize += f.size || 0;
+    } else if (vidExtensions.includes(extension)) {
+      vidSize += f.size || 0;
+    } else {
+      otherSize += f.size || 0;
+    }
+  });
+
+  const docPercentage = storageLimitBytes ? (docSize / storageLimitBytes) * 100 : 0;
+  const imgPercentage = storageLimitBytes ? (imgSize / storageLimitBytes) * 100 : 0;
+  const vidPercentage = storageLimitBytes ? (vidSize / storageLimitBytes) * 100 : 0;
+  const otherPercentage = storageLimitBytes ? (otherSize / storageLimitBytes) * 100 : 0;
+
   return (
-    <div className="w-full h-[91vh] flex flex-col items-center bg-[#FAFAFA]">
-      <div className="dash w-[98%] h-76 rounded-2xl  bg-bottom text-white bg-no-repeat inset-0 bg-linear-to-r  bg-cover pl-5 pr-5 flex flex-col gap-4 justify-center">
-        <div className="w-full h-23 bg-[#555755] p-3 mt-2 rounded-xl relative">
-          <h1 className=" text-[12px] text-[#898a89] tracking-[1.6px] font-semibold">
-            Good Afternoon 👋🏻
-          </h1>
-          <h1 className="text-[22px] font-bold">
-            {/* Welcome Back,<span className="text-[#64c0fa]">{data?.username}</span> */}
-            Welcome Back,<span className="text-[#64c0fa]">User</span>
-          </h1>
-          <p className="text-[13px]">
-            3 files shared with you . {(data?.totalSize / (1024 * 1024 * 1024)).toFixed(2)} GB of 10 GB used{" "}
-          </p>
-          <img
-            src="/cloud.png"
-            className="w-16 h-16 absolute top-5 right-6 opacity-60"
-          ></img>
+    <div className="w-full h-full flex flex-col gap-4 bg-[#FAFAFA]/10 overflow-hidden">
+      
+      {/* Upgraded Premium Greeting Banner */}
+      <div className="w-full bg-gradient-to-r from-[#171917] via-[#242724] to-[#171917] border border-gray-800/20 rounded-2xl p-4 md:py-5 md:px-6 relative overflow-hidden shadow-sm flex items-center justify-between text-white shrink-0">
+        {/* Glow orbs background decoration */}
+        <div className="absolute top-0 right-1/4 w-[200px] h-[200px] bg-blue-500/10 rounded-full blur-[60px] pointer-events-none select-none"></div>
+        <div className="absolute bottom-0 right-10 w-[150px] h-[150px] bg-emerald-500/5 rounded-full blur-[40px] pointer-events-none select-none"></div>
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-7xl opacity-[0.03] select-none pointer-events-none">
+          ☁️
         </div>
-        <div className="w-full h-28 flex justify-between ">
-          <div className="w-74 rounded-2xl h-full border text-black  border-[#cccccc]  flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img src="/file.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[16px] font-bold">{data?.totalFiles}</h1>
-                <h1 className="text-[10px] ">Total files</h1>
-              </div>
-            </div>
-            <img src="/database.webp" className="w-18 h-20"></img>
-          </div>
-          <div className="w-74 rounded-2xl h-full border text-black  border-[#cccccc]  flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d3d3d3] p-2">
-                <img src="/logo.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[16px] font-bold">{(data?.totalSize / (1024 * 1024 * 1024)).toFixed(2)} GB</h1>
-                <h1 className="text-[10px] ">Storage used</h1>
-              </div>
-            </div>
-            <img src="/progress.png" className="w-16 h-20"></img>
-          </div>
-          <div className="w-74 rounded-2xl h-full border text-black  border-[#cccccc]  flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img src="/link.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[16px] font-bold">6</h1>
-                <h1 className="text-[10px] ">Shared Files</h1>
-              </div>
-            </div>
-            <img src="/link1.png" className="w-18 h-18"></img>
-          </div>
-          <div className="w-74 rounded-2xl h-full border text-black  border-[#cccccc]  flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2 text-2xl">
-                ⭐
-              </div>
-              <div className="">
-                <h1 className="text-[16px] font-bold">{data?.favorites?.length}</h1>
-                <h1 className="text-[10px] ">Favorites</h1>
-              </div>
-            </div>
-            <img src="/star.png" className="w-16 h-16 "></img>
-          </div>
+
+        <div className="relative z-10">
+          <span className="text-[9px] text-blue-400 tracking-[2px] uppercase font-bold mb-1 block">
+            Secure Storage Portal
+          </span>
+          <h1 className="text-xl md:text-[22px] font-extrabold tracking-tight mb-1 text-white">
+            Welcome Back, <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">{data?.username || "User"}</span>
+          </h1>
+          <p className="text-[11px] text-gray-400 font-semibold">
+            {totalFoldersCount} folders • {totalFilesCount} files • {formatBytes(totalSize)} of {formatBytes(storageLimitBytes)} used
+          </p>
+        </div>
+
+        {/* Sync System Status Badge */}
+        <div className="relative z-10 hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-md rounded-xl py-1.5 px-3">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="text-[10px] text-gray-300 font-bold uppercase tracking-wider">
+            Secure & Synced
+          </span>
         </div>
       </div>
-      <div className="w-full h-[75vh] flex  ">
-        <div className="right  p-4">
-          <h1 className="text-[12px] text-[#898a89] tracking-[1.6px] font-semibold  mb-2">
-            RECENT FILES
-          </h1>
-          <div
-            className={`file w-[62vw] h-[57vh] bg-[#FFFFFF] border border-[#c6c6c6] rounded-[7px]  overflow-hidden `}
-          >
-            <div className="heading w-full h-9 bg-[#EBEAEA] flex items-center ">
-              <div className="  w-[34%] h-full flex items-center p-2  pl-7 opacity-70 text-[14px]">
-                Name
-              </div>
-              <div className=" w-[20%] h-full flex items-center p-2 opacity-70 text-[14px] ">
-                Modified
-              </div>
-              <div className=" w-[20%] h-full flex items-center p-2 pl-9 opacity-70 text-[14px] ">
-                Owner
-              </div>
-              <div className=" w-[10%] h-full flex items-center  pl-4  opacity-70 text-[14px] ">
-                Type
-              </div>
-              <div className=" w-[10%] h-full flex items-center justify-center opacity-70 text-[14px]  ">
-                Size
-              </div>
+
+      {/* Responsive Stat Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full shrink-0">
+        
+        {/* Stat Card 1: Total Files */}
+        <div className="bg-white border border-gray-200 hover:border-gray-300 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5">
+          <div className="flex flex-col gap-1.5">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+              <FiFileText className="text-base" />
             </div>
-            {files.length == 0 ? (
-              <div
-                className={`w-full h-full text-[2vw] text-[#7e7e7e] flex items-center flex-col justify-center gap-5 pb-15`}
-              >
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <img
-                    src="/empty-box.png"
-                    className="w-28 h-28 mb-4 opacity-70"
-                  />
+            <div>
+              <h3 className="text-lg font-extrabold text-gray-800 leading-none mb-0.5">{totalFilesCount}</h3>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Files</span>
+            </div>
+          </div>
+          <span className="text-3xl filter opacity-30 select-none">📁</span>
+        </div>
 
-                  <h2 className="text-lg font-semibold">No recent activity</h2>
+        {/* Stat Card 2: Storage Used */}
+        <div className="bg-white border border-gray-200 hover:border-gray-300 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5">
+          <div className="flex flex-col gap-1.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+              <FiDatabase className="text-base" />
+            </div>
+            <div>
+              <h3 className="text-lg font-extrabold text-gray-800 leading-none mb-0.5">{formatBytes(totalSize)}</h3>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Storage Used</span>
+            </div>
+          </div>
+          <span className="text-3xl filter opacity-30 select-none">📊</span>
+        </div>
 
-                  <p className="text-gray-500 text-sm mt-1">
-                    Files you open or edit will appear here.
-                  </p>
+        {/* Stat Card 3: Shared Files */}
+        <div className="bg-white border border-gray-200 hover:border-gray-300 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5">
+          <div className="flex flex-col gap-1.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
+              <FiLink className="text-base" />
+            </div>
+            <div>
+              <h3 className="text-lg font-extrabold text-gray-800 leading-none mb-0.5">{totalFoldersCount}</h3>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Folders</span>
+            </div>
+          </div>
+          <span className="text-3xl filter opacity-30 select-none">🔗</span>
+        </div>
 
-                  <button
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white text-[14px] rounded-lg cursor-pointer"
-                    onClick={() => {
-                      setActive("My Files");
-                      getdata();
-                    }}
-                  >
-                    Open Files
-                  </button>
-                </div>
+        {/* Stat Card 4: Favorites */}
+        <div className="bg-white border border-gray-200 hover:border-gray-300 rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow transition-all duration-200 hover:-translate-y-0.5">
+          <div className="flex flex-col gap-1.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
+              <FiStar className="text-base" />
+            </div>
+            <div>
+              <h3 className="text-lg font-extrabold text-gray-800 leading-none mb-0.5">{favorite.length}</h3>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Favorites</span>
+            </div>
+          </div>
+          <span className="text-3xl filter opacity-30 select-none">⭐</span>
+        </div>
+      </div>
+
+      {/* Main Dashboard Layout section - Responsive Grid filling remaining viewport space */}
+      <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-3 gap-5 w-full">
+        
+        {/* Left Column: Recent Files List (Col Span 2) */}
+        <div className="xl:col-span-2 flex flex-col gap-2 h-full min-h-0">
+          <h2 className="text-[10px] text-gray-400 tracking-[1.5px] font-bold pl-1 shrink-0 uppercase">
+            Recent Files
+          </h2>
+          
+          <div className="w-full bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full min-h-0">
+            {/* Table Header */}
+            <div className="bg-gray-50/75 border-b border-gray-150 flex items-center h-10 px-4 text-[10.5px] font-bold text-gray-400 select-none shrink-0">
+              <div className="w-[40%] pl-2">Name</div>
+              <div className="w-[22%]">Modified</div>
+              <div className="w-[18%]">Type</div>
+              <div className="w-[10%]">Owner</div>
+              <div className="w-[10%] text-right pr-2">Size</div>
+            </div>
+
+            {/* Table Body */}
+            {files.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center py-12 text-center p-6">
+                <img
+                  src="/empty-box.png"
+                  className="w-20 h-20 mb-4 opacity-50 select-none pointer-events-none"
+                  alt="Empty"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+                <h2 className="text-xs font-bold text-gray-700">No recent activity</h2>
+                <p className="text-gray-400 text-[11px] font-medium mt-1">
+                  Files you upload or edit will appear here.
+                </p>
+                <button
+                  className="mt-4 px-4 py-1.5 bg-[#4A4D4A] hover:bg-[#2E302E] text-white text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-sm hover:shadow"
+                  onClick={() => {
+                    setActive("My Files");
+                    getdata();
+                  }}
+                >
+                  Open Files
+                </button>
               </div>
             ) : (
-              <div className="data w-full h-[93%]  border-t border-[#c6c6c6] hide-scrollbar">
+              <div className="flex-1 overflow-y-auto divide-y divide-gray-100 hide-scrollbar">
                 {files.map((el) => {
                   return (
                     <Filecard
@@ -227,81 +216,109 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
             )}
           </div>
         </div>
-        <div className="w-[27vw] h-full ">
-          <h1 className="text-[12px] text-[#898a89] tracking-[1.6px] font-semibold  mt-4 mb-2">
-            STORAGE BREAKDOWN
-          </h1>
-          <div className="w-[95%] h-48 bg-white border border-[#b1b1b1] rounded-xl pl-5 pr-5">
-            <div className="h-9  flex flex-col gap-1 mt-2">
-              <div className="w-full  flex items-center justify-between">
-                <h1 className="text-[13px]">Documents</h1>
-                <h6 className="text-[12px] font-bold">24.8 GB</h6>
-              </div>
-              <div className="w-full h-2 bg-[#E0DFDF] rounded-3xl overflow-hidden">
-                <div className="progress w-[24.8%] h-full bg-[#4CA4E6] rounded-2xl"></div>
-              </div>
-            </div>
-            <div className="h-9  flex flex-col gap-1 mt-2">
-              <div className="w-full  flex items-center justify-between">
-                <h1 className="text-[13px]">Images</h1>
-                <h6 className="text-[12px] font-bold">31.8 GB</h6>
-              </div>
-              <div className="w-full h-2 bg-[#E0DFDF] rounded-3xl overflow-hidden">
-                <div className="progress w-[31.8%] h-full bg-[#f4cc7b] rounded-2xl"></div>
-              </div>
-            </div>
-            <div className="h-9  flex flex-col gap-1 mt-2">
-              <div className="w-full  flex items-center justify-between">
-                <h1 className="text-[13px]">Videos</h1>
-                <h6 className="text-[12px] font-bold">12.4 GB</h6>
-              </div>
-              <div className="w-full h-2 bg-[#E0DFDF] rounded-3xl overflow-hidden">
-                <div className="progress w-[12.4%] h-full bg-[#80eb65] rounded-2xl"></div>
-              </div>
-            </div>
-            <div className="w-full h-0.5 bg-gray-200 mt-3"></div>
-            <div className="w-full h-10  flex items-center justify-between  ">
-              <h1 className="text-[12px] text-[#898a89]  font-semibold ">
-                Total
-              </h1>
-              <h6 className="text-[12px] font-bold">{(data?.totalSize / (1024 * 1024 * 1024)).toFixed(2)}/10 GB</h6>
-            </div>
-          </div>
-          <h1 className="text-[12px] text-[#898a89] tracking-[1.6px] font-semibold  mt-2 mb-2">
-            FAVORITES
-          </h1>
-          <div className="  w-[19.8vw]  h-60 border border-[#b1b1b1] rounded-xl overflow-auto hide-scrollbar">
-            {favorite.length == 0 ? (
-              <div
-                className={`w-full h-full text-[2vw] text-[#7e7e7e] flex items-center flex-col justify-center gap-5 pb-15 p-5`}
-              >
-                <h2 className="text-lg font-semibold">No favorites yet !!!</h2>
 
-                <p className="text-gray-500 text-sm mt-1 flex flex-col items-center">
-                  Tap the ⭐ icon on any file{" "}
-                  <div className=""> to add it here</div>
-                </p>
+        {/* Right Column: Storage Breakdown & Favorites (Col Span 1) */}
+        <div className="flex flex-col gap-4 h-full min-h-0">
+          
+          {/* Storage Breakdown Card */}
+          <div className="flex flex-col gap-2 shrink-0">
+            <h2 className="text-[10px] text-gray-400 tracking-[1.5px] font-bold pl-1 uppercase">
+              Storage Breakdown
+            </h2>
+            
+            <div className="w-full bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+              {/* Docs progress bar */}
+              <div className="flex flex-col gap-1.5">
+                <div className="w-full flex items-center justify-between text-[11px] font-bold text-gray-700 leading-none">
+                  <span>Documents</span>
+                  <span className="text-gray-400 font-semibold">{formatBytes(docSize)} ({docPercentage.toFixed(1)}%)</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="progress h-full bg-[#4CA4E6] rounded-full transition-all duration-300" style={{ width: `${docPercentage}%` }}></div>
+                </div>
               </div>
-            ) : (
-              <div className="hide-scrollbar">
-                {favorite
-                  .filter((el) => el.favorites)
-                  .map((el) => (
-                    <Dashfcard
-                      name={el.name}
-                      id={el._id}
-                      key={el._id}
-                      getdata={getdata}
-                      ext={el.ext}
-                      modifed={el.updatedAt}
-                      size={el.size}
-                      favorites={el.favorites}
-                      active={active}
-                    />
-                  ))}
+
+              {/* Images progress bar */}
+              <div className="flex flex-col gap-1.5">
+                <div className="w-full flex items-center justify-between text-[11px] font-bold text-gray-700 leading-none">
+                  <span>Images</span>
+                  <span className="text-gray-400 font-semibold">{formatBytes(imgSize)} ({imgPercentage.toFixed(1)}%)</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="progress h-full bg-[#f4cc7b] rounded-full transition-all duration-300" style={{ width: `${imgPercentage}%` }}></div>
+                </div>
               </div>
-            )}
+
+              {/* Videos progress bar */}
+              <div className="flex flex-col gap-1.5">
+                <div className="w-full flex items-center justify-between text-[11px] font-bold text-gray-700 leading-none">
+                  <span>Videos</span>
+                  <span className="text-gray-400 font-semibold">{formatBytes(vidSize)} ({vidPercentage.toFixed(1)}%)</span>
+                </div>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="progress h-full bg-[#80eb65] rounded-full transition-all duration-300" style={{ width: `${vidPercentage}%` }}></div>
+                </div>
+              </div>
+
+              {/* Others progress bar */}
+              {otherSize > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <div className="w-full flex items-center justify-between text-[11px] font-bold text-gray-700 leading-none">
+                    <span>Other Files</span>
+                    <span className="text-gray-450 font-semibold">{formatBytes(otherSize)} ({otherPercentage.toFixed(1)}%)</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="progress h-full bg-[#a78bfa] rounded-full transition-all duration-300" style={{ width: `${otherPercentage}%` }}></div>
+                  </div>
+                </div>
+              )}
+
+              <div className="h-px bg-gray-150 my-0.5"></div>
+
+              {/* Total Storage Summary */}
+              <div className="w-full flex items-center justify-between text-xs font-extrabold text-gray-800">
+                <span className="text-gray-450 font-bold uppercase tracking-wider text-[10px]">Total usage</span>
+                <span>{formatBytes(totalSize)} / {formatBytes(storageLimitBytes)}</span>
+              </div>
+            </div>
           </div>
+
+          {/* Favorites List Card */}
+          <div className="flex-1 min-h-0 flex flex-col gap-2">
+            <h2 className="text-[10px] text-gray-400 tracking-[1.5px] font-bold pl-1 uppercase">
+              Favorites
+            </h2>
+            
+            <div className="w-full bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col h-full min-h-0 flex-1">
+              {favorite.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
+                  <h3 className="text-xs font-bold text-gray-600">No favorites yet</h3>
+                  <p className="text-gray-400 text-[10px] font-semibold mt-1">
+                    Tap the ⭐ icon on any file or folder to bookmark it here.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-y-auto flex flex-col gap-1 hide-scrollbar">
+                  {favorite
+                    .filter((el) => el.favorites)
+                    .map((el) => (
+                      <Dashfcard
+                        name={el.name}
+                        id={el._id}
+                        key={el._id}
+                        getdata={getdata}
+                        ext={el.ext}
+                        modifed={el.updatedAt}
+                        size={el.size}
+                        favorites={el.favorites}
+                        active={active}
+                      />
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -309,70 +326,3 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
 };
 
 export default Dashboard;
-
-{
-  /* <div className="dash w-[98%] h-76 rounded-2xl bg-[url(/dashbg.png)] bg-bottom  bg-no-repeat inset-0 bg-linear-to-r  bg-cover pl-10 pr-10 flex flex-col gap-4 justify-center">
-        <div className="w-[30vw] h-24 ">
-          <h1 className="text-[18px]">Good Afternoon</h1>
-          <h1 className="text-[28px] font-bold">
-            Welcome Back,<span className="text-[#ff8000]">Alex</span>
-          </h1>
-          <p className="text-[13px]">
-            3 files shared with you . 68.4 GB of 100 used{" "}
-          </p>
-        </div>
-        <div className="w-full h-32 flex justify-evenly text-white">
-          <div className="w-72 rounded-2xl h-full border backdrop-blur-xs flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img src="/file.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[18px] font-bold">10</h1>
-                <h1 className="text-[12px] ">Total files</h1>
-              </div>
-            </div>
-            <img src="/database.webp" className="w-22 h-22"></img>
-          </div>
-          <div className="w-72 rounded-2xl h-full border backdrop-blur-xs flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img src="/logo.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[18px] font-bold">68.4 GB</h1>
-                <h1 className="text-[12px] ">Storage used</h1>
-              </div>
-            </div>
-            <img src="/progress.png" className="w-22 h-22"></img>
-          </div>
-          <div className="w-72 rounded-2xl h-full border backdrop-blur-xs flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img src="/link.png" className="w-full h-full bg-cover"></img>
-              </div>
-              <div className="">
-                <h1 className="text-[18px] font-bold">6</h1>
-                <h1 className="text-[12px] ">Shared Files</h1>
-              </div>
-            </div>
-            <img src="/link1.png" className="w-22 h-22"></img>
-          </div>
-          <div className="w-72 rounded-2xl h-full border backdrop-blur-xs flex items-center justify-between p-4">
-            <div className="flex flex-col gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-[#d9d6d6] p-2">
-                <img
-                  src="/favourite.png"
-                  className="w-full h-full bg-cover"
-                ></img>
-              </div>
-              <div className="">
-                <h1 className="text-[18px] font-bold">4</h1>
-                <h1 className="text-[12px] ">Favorites</h1>
-              </div>
-            </div>
-            <img src="/star.png" className="w-20 h-20"></img>
-          </div>
-        </div>
-      </div> */
-}

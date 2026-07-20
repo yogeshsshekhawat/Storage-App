@@ -34,6 +34,22 @@ const Userschema = new Schema(
       default:
         "https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg?w=2000",
     },
+    plan: {
+      type: String,
+      default: "Basic",
+      enum: ["Basic", "Pro", "Enterprise"],
+    },
+    storageLimit: {
+      type: Number,
+      default: 200 * 1024 * 1024, // 200 MB
+    },
+    pendingPlan: {
+      type: String,
+      enum: ["Basic", "Pro", "Enterprise"],
+    },
+    downgradeAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

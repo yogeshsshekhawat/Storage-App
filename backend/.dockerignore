@@ -1,0 +1,10 @@
+node_modules
+.env
+.env.*
+scratch
+.git
+.gitignore
+Dockerfile
+.dockerignore
+npm-debug.log
+.antigravityignore

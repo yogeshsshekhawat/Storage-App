@@ -2,6 +2,7 @@ import cron from "node-cron";
 import fs from "fs/promises";
 import path from "path";
 import File from "../models/filemodel.js";
+import { deleteFromS3 } from "../config/s3Service.js";
 
 
 cron.schedule("0 2 * * *", async () => {
@@ -24,16 +25,9 @@ cron.schedule("0 2 * * *", async () => {
     await Promise.all(
       expiredFiles.map(async (file) => {
         try {
-          // ✅ Absolute path
-          const filePath = path.join(
-            process.cwd(),
-            "public",
-            `${file._id}${file.ext}`
-          );
-
-          // delete from disk
-          await fs.unlink(filePath).catch(() => {
-            console.warn(`⚠️ File not found: ${filePath}`);
+          // delete from S3
+          await deleteFromS3(`${file._id}${file.ext}`).catch((err) => {
+            console.warn(`⚠️ S3 File delete failed during cron: ${file._id}${file.ext}`, err);
           });
 
           // delete from DB

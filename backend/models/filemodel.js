@@ -48,6 +48,19 @@ const fileschema = new Schema(
       type: String,
       default: null,
     },
+    sharedWith: {
+      type: [
+        {
+          email: String,
+          permission: {
+            type: String,
+            enum: ["view", "edit"],
+            default: "view",
+          },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

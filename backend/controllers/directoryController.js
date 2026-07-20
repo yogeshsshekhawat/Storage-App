@@ -1,18 +1,18 @@
 import express from "express";
+import mongoose from "mongoose";
 import { readdir, rm } from "node:fs/promises";
 import file from "../models/filemodel.js";
 import directory from "../models/directorymodel.js";
-import validate from "../middlewares/validate.js";
-import Session from "../models/SessionModel.js";
 import User from "../models/UserModel.js";
+import { deleteFromS3 } from "../config/s3Service.js";
 
 export const getdir = async (req, res) => {
-  const { sid } = req.signedCookies;
   const { id } = req.params;
   const { type } = req.headers;
+  const { sid } = req.signedCookies;
 
-  const session = await Session.findById(sid);
-  const userid = session.userid;
+  const session = req.session;
+  const userid = new mongoose.Types.ObjectId(session.userid);
   const usertoverify = await User.findById(userid);
 
   if (!usertoverify.isVerified) {
@@ -37,6 +37,7 @@ export const getdir = async (req, res) => {
 
   const totalSize = stats[0]?.totalSize || 0;
   const totalFiles = stats[0]?.totalFiles || 0;
+  const totalFolders = await directory.countDocuments({ userid, name: { $ne: "root" } });
   if (type == "Favorites") {
     const files = await file.find({
       userid: userid,
@@ -50,9 +51,12 @@ export const getdir = async (req, res) => {
         path: ["images"],
         totalSize,
         totalFiles,
+        totalFolders,
         username: username.name,
         profilepic: username.profilepic,
         useremail: username.email,
+        plan: username.plan,
+        storageLimit: username.storageLimit || 200 * 1024 * 1024,
       });
     }
   }
@@ -67,9 +71,12 @@ export const getdir = async (req, res) => {
         files: files,
         totalSize,
         totalFiles,
+        totalFolders,
         username: username.name,
         profilepic: username.profilepic,
         useremail: username.email,
+        plan: username.plan,
+        storageLimit: username.storageLimit || 200 * 1024 * 1024,
       });
     }
   }
@@ -85,9 +92,12 @@ export const getdir = async (req, res) => {
         favorites: files1,
         totalSize,
         totalFiles,
+        totalFolders,
         username: username.name,
         profilepic: username.profilepic,
         useremail: username.email,
+        plan: username.plan,
+        storageLimit: username.storageLimit || 200 * 1024 * 1024,
       });
     }
   }
@@ -106,7 +116,7 @@ export const getdir = async (req, res) => {
         let path = [];
 
         while (current) {
-          path.unshift(current.name);
+          path.unshift({ name: current.name, id: current._id });
           if (!current.parentid) break;
 
           current = await directory.findOne({ _id: current.parentid });
@@ -125,6 +135,11 @@ export const getdir = async (req, res) => {
         username: username.name,
         profilepic: username.profilepic,
         useremail: username.email,
+        plan: username.plan,
+        totalSize,
+        totalFiles,
+        totalFolders,
+        storageLimit: username.storageLimit || 200 * 1024 * 1024,
       });
     }
   }
@@ -143,7 +158,7 @@ export const getdir = async (req, res) => {
     let current = parentid;
     let path = [];
     while (current) {
-      path.unshift(current.name);
+      path.unshift({ name: current.name, id: current._id });
       if (!current.parentid) break;
 
       current = await directory.findOne({ _id: current.parentid });
@@ -157,9 +172,12 @@ export const getdir = async (req, res) => {
         path: path,
         totalSize,
         totalFiles,
+        totalFolders,
         username: username.name,
         profilepic: username.profilepic,
         useremail: username.email,
+        plan: username.plan,
+        storageLimit: username.storageLimit || 200 * 1024 * 1024,
       });
     }
   } else {
@@ -169,8 +187,7 @@ export const getdir = async (req, res) => {
 
 export const postdir = async (req, res) => {
   const { id } = req.params;
-  const { sid } = req.signedCookies;
-  const sesion = await Session.findById(sid);
+  const sesion = req.session;
   const userid = sesion.userid;
   const { foldername } = req.body;
 
@@ -202,8 +219,7 @@ export const patchdir = async (req, res) => {
 
 export const deletedir = async (req, res, next) => {
   const { id } = req.params;
-  const { sid } = req.signedCookies;
-  const sesion = await Session.findById(sid);
+  const sesion = req.session;
   const userid = sesion.userid;
   const directoryData = await directory.findOne(
     {
@@ -236,7 +252,11 @@ export const deletedir = async (req, res, next) => {
   const { files, directories } = await getDirectoryContents(id);
 
   for (const { _id, ext } of files) {
-    await rm(`./public/${_id}${ext}`);
+    try {
+      await deleteFromS3(`${_id}${ext}`);
+    } catch (err) {
+      console.warn(`S3 delete failed for key ${_id}${ext} during directory cleanup:`, err);
+    }
   }
 
   await file.deleteMany({

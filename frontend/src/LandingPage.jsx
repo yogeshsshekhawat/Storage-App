@@ -1,1501 +1,1165 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router";
+import {
+  FiUploadCloud,
+  FiShield,
+  FiFolder,
+  FiTrash2,
+  FiCheck,
+  FiShare2,
+  FiStar,
+  FiSettings,
+  FiClock,
+  FiSearch,
+  FiFileText,
+  FiImage,
+  FiVideo,
+  FiFolderPlus
+} from "react-icons/fi";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-const BASE_URl = import.meta.env.VITE_API_URL;
+const BASE_URl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-/* ─── Responsive hook ───────────────────────────────────────── */
-function useBreakpoint() {
-  const [bp, setBp] = useState(() => {
-    const w = typeof window !== "undefined" ? window.innerWidth : 1200;
-    return w < 640 ? "xs" : w < 768 ? "sm" : w < 1024 ? "md" : "lg";
-  });
-  useEffect(() => {
-    const fn = () => {
-      const w = window.innerWidth;
-      setBp(w < 640 ? "xs" : w < 768 ? "sm" : w < 1024 ? "md" : "lg");
-    };
-    window.addEventListener("resize", fn);
-    return () => window.removeEventListener("resize", fn);
-  }, []);
-  return bp;
-}
-
-const LAND_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  /* exact same tokens as the app */
-  --bg:#FAFAFA;
-  --surf:#FFFFFF;
-  --surf2:#F4F3F3;
-  --surf3:#EBEAEA;
-  --bdr:#E0DFDF;
-  --bdr2:#CECECE;
-  --accent:#4A4D4A;
-  --accent2:#2E302E;
-  --ahover:#5A5D5A;
-  --tx:#1A1C1A;
-  --tx2:#4A4D4A;
-  --tx3:#8A8D8A;
-  --green:#16A34A;
-  --amber:#D97706;
-  --red:#DC2626;
-  --blue:#0284C7;
-  --r:12px;--rs:8px;
-  --font:'Plus Jakarta Sans',sans-serif;
-  --shadow:0 1px 4px #00000010,0 4px 16px #00000008;
-  --shadow-md:0 2px 8px #00000014,0 8px 32px #0000000C;
-  --shadow-lg:0 4px 16px #00000018,0 16px 48px #00000010;
-  /* accent palette for landing pops */
-  --pop1:#0284C7;
-  --pop2:#7C3AED;
-  --pop3:#16A34A;
-  --pop4:#D97706;
-  --pop5:#DC2626;
-  --pop6:#DB2777;
-}
-
-html{scroll-behavior:smooth}
-body{
-  font-family:var(--font);
-  background:var(--bg);
-  color:var(--tx);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
-button,a{cursor:pointer}
-
-/* ══ NAV ══════════════════════════════════════════════════════════ */
-.lnav{
-  position:fixed;top:0;left:0;right:0;z-index:900;
-  display:flex;align-items:center;padding:0 6%;
-  height:60px;
-  transition:background .25s,box-shadow .25s,backdrop-filter .25s;
-  background:transparent;
-}
-.lnav.scrolled{
-  background:#FAFAFAee;
-  box-shadow:0 1px 0 var(--bdr),0 4px 16px #00000008;
-  backdrop-filter:blur(12px);
-}
-.lnav-logo{
-  display:flex;align-items:center;gap:8px;
-  font-size:17px;font-weight:800;letter-spacing:-.4px;
-  color:var(--accent2);text-decoration:none;
-}
-.lnav-logo-ico{font-size:20px}
-.lnav-links{display:flex;align-items:center;gap:0;margin:0 auto}
-.lnav-link{
-  padding:6px 13px;border-radius:8px;
-  font-size:13px;font-weight:500;color:var(--tx2);
-  transition:color .15s,background .15s;text-decoration:none;
-}
-.lnav-link:hover{color:var(--tx);background:var(--surf3)}
-.lnav-acts{display:flex;align-items:center;gap:7px}
-.ln-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 16px;border-radius:var(--rs);
-  font-size:13px;font-weight:600;border:none;
-  transition:all .18s;font-family:var(--font);
-}
-.ln-ghost{
-  background:transparent;color:var(--tx2);
-  border:1.5px solid var(--bdr2);
-}
-.ln-ghost:hover{background:var(--surf3);color:var(--tx);border-color:var(--accent)}
-.ln-solid{
-  background:var(--accent);color:#fff;
-  box-shadow:0 2px 8px #4A4D4A25;
-}
-.ln-solid:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 14px #4A4D4A35}
-
-/* ══ HERO ═════════════════════════════════════════════════════════ */
-.hero{
-  position:relative;min-height:100vh;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  overflow:hidden;padding:100px 6% 80px;
-  background:var(--bg);
-}
-#cv-canvas{
-  position:absolute;inset:0;z-index:0;
-  width:100%;height:100%;
-  pointer-events:none;
-}
-/* CSS gradient orbs behind canvas */
-.hero-orbs{
-  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-}
-.hero-orb{
-  position:absolute;border-radius:50%;filter:blur(80px);
-  transform:translate(-50%,-50%);
-}
-.hero-orb-1{
-  width:600px;height:600px;
-  top:45%;left:50%;
-  background:radial-gradient(circle,#0284C740 0%,#7C3AED28 40%,transparent 70%);
-  animation:orbFloat1 8s ease-in-out infinite;
-}
-.hero-orb-2{
-  width:440px;height:440px;
-  top:30%;left:25%;
-  background:radial-gradient(circle,#16A34A30 0%,#0891B220 50%,transparent 70%);
-  animation:orbFloat2 10s ease-in-out infinite;
-}
-.hero-orb-3{
-  width:380px;height:380px;
-  top:60%;left:75%;
-  background:radial-gradient(circle,#D9770635 0%,#DB277720 50%,transparent 70%);
-  animation:orbFloat3 12s ease-in-out infinite;
-}
-.hero-orb-4{
-  width:280px;height:280px;
-  top:20%;left:70%;
-  background:radial-gradient(circle,#7C3AED25 0%,transparent 70%);
-  animation:orbFloat1 9s ease-in-out infinite reverse;
-}
-.hero-orb-5{
-  width:200px;height:200px;
-  top:75%;left:20%;
-  background:radial-gradient(circle,#DC262628 0%,transparent 70%);
-  animation:orbFloat2 7s ease-in-out infinite reverse;
-}
-@keyframes orbFloat1{
-  0%,100%{transform:translate(-50%,-50%) scale(1)}
-  33%{transform:translate(-50%,-50%) scale(1.08) translate(18px,-12px)}
-  66%{transform:translate(-50%,-50%) scale(0.95) translate(-12px,16px)}
-}
-@keyframes orbFloat2{
-  0%,100%{transform:translate(-50%,-50%) scale(1)}
-  40%{transform:translate(-50%,-50%) scale(1.12) translate(-20px,10px)}
-  70%{transform:translate(-50%,-50%) scale(0.92) translate(14px,-18px)}
-}
-@keyframes orbFloat3{
-  0%,100%{transform:translate(-50%,-50%) scale(1)}
-  30%{transform:translate(-50%,-50%) scale(1.1) translate(10px,20px)}
-  60%{transform:translate(-50%,-50%) scale(0.9) translate(-16px,-10px)}
-}
-.hero-content{position:relative;z-index:2;text-align:center;max-width:1060px}
-
-.hero-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:5px 14px 5px 8px;
-  background:var(--surf);border:1.5px solid var(--bdr2);
-  border-radius:99px;font-size:12px;font-weight:600;
-  color:var(--tx2);margin-bottom:28px;
-  box-shadow:var(--shadow);
-  animation:fadeup .55s both;
-}
-.hero-badge-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 0 3px #16A34A22;
-  animation:ping 2s ease-in-out infinite;
-}
-@keyframes ping{0%,100%{box-shadow:0 0 0 3px #16A34A22}50%{box-shadow:0 0 0 7px #16A34A12}}
-
-.hero-h1{
-  font-size:clamp(120px,7vw,82px);font-weight:800;
-  line-height:1.01;letter-spacing:-2.5px;
-  color:var(--tx);margin-bottom:22px;
-  animation:fadeup .55s .08s both;
-}
-.hero-h1 em{
-  font-style:normal;
-  background:linear-gradient(135deg,var(--pop1) 0%,var(--pop2) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.hero-sub{
-  font-size:clamp(15px,2vw,18px);color:var(--tx2);
-  line-height:1.75;max-width:520px;margin:0 auto 38px;
-  animation:fadeup .55s .16s both;
-}
-.hero-ctas{
-  display:flex;gap:10px;justify-content:center;
-  flex-wrap:wrap;animation:fadeup .55s .24s both;
-}
-.ln-hero{padding:13px 28px;font-size:14.5px;border-radius:10px}
-
-.hero-proof{
-  display:flex;align-items:center;justify-content:center;
-  gap:20px;margin-top:20px;
-  animation:fadeup .55s .32s both;flex-wrap:wrap;
-}
-.hero-proof-item{font-size:12px;color:var(--tx3);display:flex;align-items:center;gap:5px}
-.hero-proof-dot{width:3px;height:3px;border-radius:50%;background:var(--bdr2)}
-
-.hero-stats{
-  display:flex;gap:0;justify-content:center;
-  margin-top:64px;animation:fadeup .55s .4s both;
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:16px;box-shadow:var(--shadow);
-  overflow:hidden;flex-wrap:wrap;
-  position:relative;z-index:2;
-}
-.hero-stat{
-  padding:18px 32px;text-align:center;
-  border-right:1px solid var(--bdr);flex:1;min-width:120px;
-}
-.hero-stat:last-child{border-right:none}
-.hero-stat-val{
-  font-size:22px;font-weight:800;letter-spacing:-.5px;
-  color:var(--tx);
-}
-.hero-stat-lbl{font-size:11.5px;color:var(--tx3);margin-top:2px}
-
-@keyframes fadeup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-/* ══ LOGO MARQUEE ════════════════════════════════════════════════ */
-.logo-bar{
-  padding:22px 0;
-  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
-  background:var(--surf);overflow:hidden;position:relative;
-}
-.logo-bar::before,.logo-bar::after{
-  content:'';position:absolute;top:0;bottom:0;width:100px;z-index:2;pointer-events:none;
-}
-.logo-bar::before{left:0;background:linear-gradient(90deg,var(--surf),transparent)}
-.logo-bar::after{right:0;background:linear-gradient(-90deg,var(--surf),transparent)}
-.logo-track{
-  display:flex;gap:56px;align-items:center;
-  animation:marquee 20s linear infinite;white-space:nowrap;
-}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.logo-item{
-  font-size:12.5px;font-weight:700;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--tx3);flex-shrink:0;
-}
-
-/* ══ SECTION COMMONS ═════════════════════════════════════════════ */
-.lsec{padding:96px 6%}
-.lsec-inner{max-width:1080px;margin:0 auto}
-.lsec-label{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--tx3);margin-bottom:12px;
-}
-.lsec-label::before{content:'';width:16px;height:2px;background:var(--accent);border-radius:99px}
-.lsec-h{
-  font-size:clamp(26px,3.8vw,42px);font-weight:800;
-  letter-spacing:-1.2px;color:var(--tx);line-height:1.1;margin-bottom:14px;
-}
-.lsec-sub{font-size:16px;color:var(--tx2);line-height:1.7;max-width:500px}
-
-/* ══ FEATURES ════════════════════════════════════════════════════ */
-.feat-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:14px;margin-top:52px;
-}
-.feat-card{
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:16px;padding:26px;
-  transition:border-color .2s,transform .2s,box-shadow .2s;
-  position:relative;overflow:hidden;
-}
-.feat-card:hover{
-  border-color:var(--bdr2);
-  transform:translateY(-4px);
-  box-shadow:0 12px 40px #00000010;
-}
-.feat-card-stripe{
-  position:absolute;top:0;left:0;right:0;height:3px;
-  border-radius:16px 16px 0 0;
-}
-.feat-ico{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;margin-bottom:16px;
-  border:1.5px solid var(--bdr);
-}
-.feat-title{font-size:15.5px;font-weight:700;color:var(--tx);margin-bottom:8px}
-.feat-desc{font-size:13px;color:var(--tx2);line-height:1.65}
-.feat-badge{
-  display:inline-flex;margin-top:14px;padding:3px 9px;
-  border-radius:99px;font-size:10.5px;font-weight:700;
-  letter-spacing:.3px;
-}
-
-/* ══ SHOWCASE SPLIT ══════════════════════════════════════════════ */
-.showcase{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:56px;align-items:center;
-}
-.showcase-visual{
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:20px;padding:20px;
-  box-shadow:var(--shadow-md);position:relative;overflow:hidden;
-}
-.showcase-visual::before{
-  content:'';position:absolute;
-  top:-60px;right:-60px;width:220px;height:220px;
-  border-radius:50%;
-  background:radial-gradient(circle,var(--pop1)08,transparent 70%);
-  pointer-events:none;
-}
-.mock-topbar{
-  display:flex;align-items:center;gap:8px;
-  padding-bottom:14px;margin-bottom:14px;
-  border-bottom:1px solid var(--bdr);
-}
-.mock-dot-r{width:9px;height:9px;border-radius:50%;background:#FF5F57}
-.mock-dot-y{width:9px;height:9px;border-radius:50%;background:#FFBD2E}
-.mock-dot-g{width:9px;height:9px;border-radius:50%;background:#28C840}
-.mock-titlebar{font-size:11.5px;font-weight:600;color:var(--tx3);margin:0 auto}
-.mock-file{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 10px;border-radius:10px;
-  margin-bottom:4px;transition:background .12s;
-}
-.mock-file:hover{background:var(--surf2)}
-.mock-fname{font-size:12.5px;font-weight:600;color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mock-fmeta{font-size:10.5px;color:var(--tx3);flex-shrink:0}
-.mock-pbar{height:4px;border-radius:99px;background:var(--surf3);overflow:hidden;margin-top:3px}
-.mock-pfill{height:100%;border-radius:99px}
-.mock-footer{
-  margin-top:12px;padding:10px 12px;
-  background:var(--surf2);border-radius:10px;
-  display:flex;justify-content:space-between;
-  font-size:11.5px;color:var(--tx3);
-  border:1px solid var(--bdr);
-}
-
-/* ══ HOW IT WORKS ════════════════════════════════════════════════ */
-.steps{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:0;margin-top:52px;position:relative;
-}
-.steps::before{
-  content:'';position:absolute;
-  top:21px;left:calc(12.5% + 12px);right:calc(12.5% + 12px);
-  height:2px;
-  background:linear-gradient(90deg,var(--surf3),var(--bdr2) 30%,var(--bdr2) 70%,var(--surf3));
-}
-.step{text-align:center;padding:0 14px}
-.step-num{
-  width:42px;height:42px;border-radius:50%;
-  background:var(--surf);border:2px solid var(--bdr2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:800;color:var(--accent2);
-  margin:0 auto 16px;position:relative;z-index:1;
-  box-shadow:var(--shadow);
-}
-.step-title{font-size:14.5px;font-weight:700;color:var(--tx);margin-bottom:6px}
-.step-desc{font-size:12.5px;color:var(--tx2);line-height:1.6}
-
-/* ══ PRICING ═════════════════════════════════════════════════════ */
-.pricing-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:14px;margin-top:52px;
-}
-.plan-card{
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:20px;padding:28px 24px;
-  transition:border-color .2s,transform .2s,box-shadow .2s;
-  position:relative;
-}
-.plan-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
-.plan-card.featured{
-  background:linear-gradient(160deg,#1A1C1A 0%,#2E302E 100%);
-  border-color:#4A4D4A;color:#FAFAFA;
-}
-.plan-top-badge{
-  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
-  background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;
-  padding:3px 12px;border-radius:99px;white-space:nowrap;letter-spacing:.5px;
-}
-.plan-name{font-size:15px;font-weight:800;color:var(--tx);margin-bottom:4px}
-.plan-card.featured .plan-name{color:#FAFAFA}
-.plan-desc{font-size:12.5px;color:var(--tx3);margin-bottom:22px}
-.plan-card.featured .plan-desc{color:#8A8D8A}
-.plan-price{
-  font-size:38px;font-weight:800;letter-spacing:-1px;
-  color:var(--tx);line-height:1;
-}
-.plan-card.featured .plan-price{color:#FAFAFA}
-.plan-price sup{font-size:18px;vertical-align:top;margin-top:6px}
-.plan-price span{font-size:13px;font-weight:500;color:var(--tx3)}
-.plan-divider{height:1px;background:var(--bdr);margin:20px 0}
-.plan-card.featured .plan-divider{background:#4A4D4A}
-.plan-perks{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
-.plan-perk{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--tx2)}
-.plan-card.featured .plan-perk{color:#EBEAEA}
-.plan-perk-check{font-size:12px;flex-shrink:0;margin-top:1px}
-.plan-btn{
-  width:100%;padding:12px;border-radius:10px;
-  font-size:13px;font-weight:700;border:none;
-  font-family:var(--font);transition:all .18s;
-}
-.plan-btn-light{background:var(--surf3);color:var(--tx)}
-.plan-btn-light:hover{background:var(--bdr2);color:var(--accent2)}
-.plan-btn-dark{background:var(--surf);color:var(--accent2)}
-.plan-btn-dark:hover{background:var(--surf2)}
-
-/* ══ TESTIMONIALS ════════════════════════════════════════════════ */
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:52px}
-.testi-card{
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:16px;padding:22px;
-  transition:box-shadow .2s;
-}
-.testi-card:hover{box-shadow:var(--shadow-md)}
-.testi-stars{color:var(--amber);font-size:13px;letter-spacing:2px;margin-bottom:14px}
-.testi-text{font-size:13.5px;color:var(--tx2);line-height:1.7;font-style:italic}
-.testi-author{display:flex;align-items:center;gap:10px;margin-top:16px}
-.testi-av{
-  width:34px;height:34px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
-}
-.testi-name{font-size:12.5px;font-weight:700;color:var(--tx)}
-.testi-role{font-size:11px;color:var(--tx3)}
-
-/* ══ FAQ ══════════════════════════════════════════════════════════ */
-.faq-list{max-width:960px;margin:48px auto 0;display:flex;flex-direction:column;gap:8px;}
-.faq-item{
-  background:var(--surf);border:1.5px solid var(--bdr);
-  border-radius:12px;overflow:hidden;
-}
-.faq-q{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:17px 20px;cursor:pointer;transition:background .12s;
-}
-.faq-q:hover{background:var(--surf2)}
-.faq-q-text{font-size:14px;font-weight:600;color:var(--tx)}
-.faq-chevron{color:var(--tx3);transition:transform .25s;flex-shrink:0}
-.faq-chevron.open{transform:rotate(180deg)}
-.faq-a{
-  font-size:13.5px;color:var(--tx2);line-height:1.75;
-  padding:0 20px;max-height:0;overflow:hidden;
-  transition:max-height .3s ease,padding .3s;
-}
-.faq-a.open{max-height:200px;padding:0 20px 17px}
-
-/* ══ CTA BANNER ══════════════════════════════════════════════════ */
-.cta-banner{
-  margin:0 6% 96px;
-  border-radius:24px;
-  background:linear-gradient(135deg,var(--accent2) 0%,var(--accent) 100%);
-  padding:64px;text-align:center;
-  position:relative;overflow:hidden;
-}
-.cta-banner::before{
-  content:'☁️';
-  position:absolute;right:40px;top:50%;transform:translateY(-50%);
-  font-size:120px;opacity:.05;
-}
-.cta-banner-h{
-  font-size:clamp(26px,4vw,44px);font-weight:800;
-  letter-spacing:-1.2px;color:#fff;margin-bottom:12px;
-  position:relative;
-}
-.cta-banner-sub{
-  font-size:16px;color:#EBEAEACC;margin-bottom:32px;position:relative;
-}
-.cta-banner-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative}
-.cta-light{background:#fff;color:var(--accent2);padding:13px 28px;font-size:14.5px}
-.cta-light:hover{background:var(--surf2);transform:translateY(-1px)}
-.cta-outline{
-  background:transparent;color:#fff;
-  border:1.5px solid #ffffff50;padding:13px 24px;font-size:14.5px;
-}
-.cta-outline:hover{background:#ffffff14;border-color:#ffffff80}
-
-/* ══ FOOTER ══════════════════════════════════════════════════════ */
-.lfooter{border-top:1px solid var(--bdr);padding:56px 6% 36px;background:var(--surf)}
-.lfooter-top{
-  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
-  gap:48px;max-width:1080px;margin:0 auto 44px;
-}
-.lfooter-brand{font-size:16px;font-weight:800;color:var(--accent2);margin-bottom:8px;display:flex;align-items:center;gap:7px}
-.lfooter-sub{font-size:13px;color:var(--tx3);line-height:1.6;max-width:230px}
-.lfooter-col-title{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--tx3);margin-bottom:14px}
-.lfooter-link{display:block;font-size:13px;color:var(--tx3);margin-bottom:9px;transition:color .15s;text-decoration:none}
-.lfooter-link:hover{color:var(--tx)}
-.lfooter-bottom{
-  max-width:1080px;margin:0 auto;
-  display:flex;align-items:center;justify-content:space-between;
-  padding-top:28px;border-top:1px solid var(--bdr);
-  flex-wrap:wrap;gap:10px;
-}
-.lfooter-copy{font-size:12px;color:var(--tx3)}
-.lfooter-socials{display:flex;gap:6px}
-.lfooter-soc{
-  width:30px;height:30px;border-radius:7px;
-  border:1.5px solid var(--bdr);background:var(--surf2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;color:var(--tx3);transition:all .15s;
-}
-.lfooter-soc:hover{border-color:var(--bdr2);color:var(--tx);background:var(--surf3)}
-
-/* ══ RESPONSIVE ══════════════════════════════════════════════════ */
-@media(max-width:1024px){
-  .feat-grid{grid-template-columns:repeat(2,1fr)}
-  .pricing-grid{grid-template-columns:repeat(2,1fr)}
-  .testi-grid{grid-template-columns:repeat(2,1fr)}
-  .showcase{grid-template-columns:1fr;gap:28px}
-  .lfooter-top{grid-template-columns:1fr 1fr}
-}
-@media(max-width:768px){
-  .lnav-links{display:none}
-  .feat-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr 1fr}
-  .steps::before{display:none}
-  .pricing-grid{grid-template-columns:1fr}
-  .testi-grid{grid-template-columns:1fr}
-  .cta-banner{padding:40px 24px;margin:0 4% 72px}
-  .lsec{padding:64px 5%}
-  .lfooter-top{grid-template-columns:1fr 1fr}
-  .hero-stats{flex-direction:column}
-  .hero-stat{border-right:none;border-bottom:1px solid var(--bdr)}
-  .hero-stat:last-child{border-bottom:none}
-}
-@media(max-width:640px){
-  .steps{grid-template-columns:1fr}
-  .hero-ctas{flex-direction:column;align-items:center}
-  .lfooter-top{grid-template-columns:1fr}
-  .lfooter-bottom{flex-direction:column;text-align:center}
-  .lnav{padding:0 4%}
-  .lsec{padding:52px 4%}
-  .cta-banner{padding:36px 20px;margin:0 3% 60px}
-}
-`;
-export default function LandingPage({ onLogin, onSignup }) {
+export default function LandingPage() {
   const navigate = useNavigate();
-  const canvasRef = useRef(null);
-  const threeRef = useRef({});
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
-  async function createsession() {
-    const response = await fetch(`${BASE_URl}/user/session`, {
-      method: "POST",
-      credentials: "include",
-    });
-    const data = await response.json();
-    if (data === "already login") {
-      navigate("/drive");
-    }
-  }
-  /* ── scroll listener ── */
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    async function checkSession() {
+      try {
+        const response = await fetch(`${BASE_URl}/checklogin`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data === "already login") {
+            navigate("/drive");
+          }
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+      }
+    }
+    checkSession();
+  }, [navigate]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 30);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ── 2D canvas gradient circle animation ── */
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let animId;
-    let W, H;
+    gsap.registerPlugin(ScrollTrigger);
 
-    const resize = () => {
-      W = canvas.width = canvas.offsetWidth;
-      H = canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
+    const track = document.querySelector(".features-track");
+    if (!track) return;
 
-    /* circle definitions — center coords are 0..1 normalized */
-    const circles = [
-      {
-        cx: 0.5,
-        cy: 0.48,
-        r: 0.32,
-        c1: "rgba(2,132,199,0.28)",
-        c2: "rgba(124,58,237,0.18)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.0007,
-        dx: 0.04,
-        dy: 0.03,
-      },
-      {
-        cx: 0.28,
-        cy: 0.35,
-        r: 0.24,
-        c1: "rgba(22,163,74,0.22)",
-        c2: "rgba(8,145,178,0.14)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.0009,
-        dx: -0.03,
-        dy: 0.04,
-      },
-      {
-        cx: 0.72,
-        cy: 0.6,
-        r: 0.22,
-        c1: "rgba(217,119,6,0.22)",
-        c2: "rgba(219,39,119,0.14)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.0008,
-        dx: 0.02,
-        dy: -0.05,
-      },
-      {
-        cx: 0.72,
-        cy: 0.25,
-        r: 0.17,
-        c1: "rgba(124,58,237,0.20)",
-        c2: "rgba(2,132,199,0.10)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.001,
-        dx: -0.04,
-        dy: 0.03,
-      },
-      {
-        cx: 0.22,
-        cy: 0.7,
-        r: 0.15,
-        c1: "rgba(220,38,38,0.18)",
-        c2: "rgba(217,119,6,0.10)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.0011,
-        dx: 0.03,
-        dy: -0.03,
-      },
-      {
-        cx: 0.5,
-        cy: 0.5,
-        r: 0.42,
-        c1: "rgba(2,132,199,0.07)",
-        c2: "rgba(124,58,237,0.05)",
-        c3: "rgba(0,0,0,0)",
-        speed: 0.0004,
-        dx: 0.01,
-        dy: 0.01,
-      },
-    ];
+    let mm = gsap.matchMedia();
 
-    /* give each circle its own phase offset */
-    const phases = circles.map((_, i) => i * 1.1);
+    // DESKTOP animations (width >= 768px)
+    mm.add("(min-width: 768px)", () => {
+      // 1. Horizontal Features Pin
+      const scrollAmount = track.scrollWidth - track.parentElement.clientWidth;
 
-    let t = 0;
-    let mx = 0.5,
-      my = 0.5;
-    const onMouse = (e) => {
-      mx = e.clientX / window.innerWidth;
-      my = e.clientY / window.innerHeight;
-    };
-    window.addEventListener("mousemove", onMouse);
-
-    const draw = () => {
-      animId = requestAnimationFrame(draw);
-      t += 0.006;
-      ctx.clearRect(0, 0, W, H);
-
-      circles.forEach((c, i) => {
-        /* parallax offset based on mouse — each layer moves differently */
-        const depth = 0.04 + i * 0.015;
-        const px = (mx - 0.5) * depth * W;
-        const py = (my - 0.5) * depth * H;
-
-        /* floating oscillation */
-        const ox = Math.sin(t * c.speed * 900 + phases[i]) * c.dx * W;
-        const oy = Math.cos(t * c.speed * 700 + phases[i] * 1.3) * c.dy * H;
-
-        const cx = c.cx * W + ox + px;
-        const cy = c.cy * H + oy + py;
-        const r = c.r * Math.min(W, H);
-
-        /* breathing scale */
-        const scale = 1 + Math.sin(t * c.speed * 600 + phases[i]) * 0.08;
-        const rad = r * scale;
-
-        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-        grd.addColorStop(0, c.c1);
-        grd.addColorStop(0.5, c.c2);
-        grd.addColorStop(1, c.c3);
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, rad, 0, Math.PI * 2);
-        ctx.fillStyle = grd;
-        ctx.fill();
+      gsap.to(track, {
+        x: -scrollAmount,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "#features",
+          pin: true,
+          scrub: 1,
+          start: "top top",
+          end: () => `+=${scrollAmount + 250}`,
+          invalidateOnRefresh: true,
+        }
       });
 
-      /* soft central bloom */
-      const bx = W * 0.5 + (mx - 0.5) * 20;
-      const by = H * 0.46 + (my - 0.5) * 12;
-      const br = Math.min(W, H) * (0.18 + Math.sin(t * 0.4) * 0.02);
-      const bloom = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-      bloom.addColorStop(0, "rgba(250,250,250,0.55)");
-      bloom.addColorStop(0.4, "rgba(250,250,250,0.12)");
-      bloom.addColorStop(1, "rgba(250,250,250,0)");
-      ctx.beginPath();
-      ctx.arc(bx, by, br, 0, Math.PI * 2);
-      ctx.fillStyle = bloom;
-      ctx.fill();
-    };
-    draw();
+      // 2. Vertical Serpentine Flow Draw Line (6 steps)
+      const flowTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#flow",
+          scrub: 1,
+          start: "top 75%",
+          end: "bottom 85%",
+          invalidateOnRefresh: true,
+        }
+      });
 
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMouse);
-    };
+      // Initial settings for elements (Circles completely invisible, details hidden)
+      gsap.set(["#flow-step-1", "#flow-step-2", "#flow-step-3", "#flow-step-4", "#flow-step-5", "#flow-step-6"], {
+        width: "16px",
+        height: "16px",
+        backgroundColor: "#ffffff",
+        borderColor: "#E0DFDF",
+        opacity: 0
+      });
+      gsap.set(["#flow-svg-serpentine", "#flow-svg-serpentine-track"], { opacity: 0 });
+      gsap.set(["#flow-num-1", "#flow-num-2", "#flow-num-3", "#flow-num-4", "#flow-num-5", "#flow-num-6"], { opacity: 0 });
+      gsap.set(["#flow-detail-1", "#flow-detail-2", "#flow-detail-3", "#flow-detail-4", "#flow-detail-5", "#flow-detail-6"], { opacity: 0, y: 15 });
+
+      flowTl
+        // 1. First fade in the connector track lines
+        .to(["#flow-svg-serpentine", "#flow-svg-serpentine-track"], { opacity: 1, duration: 0.15 })
+
+        // Step 1: Active immediately
+        .to("#flow-step-1", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-1", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-1", { opacity: 1, y: 0, duration: 0.1 }, "<")
+
+        // Draw to Step 2
+        .to("#flow-path-line", { strokeDashoffset: 80, duration: 0.2 })
+        .to("#flow-step-2", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-2", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-2", { opacity: 1, y: 0, duration: 0.1 }, "<")
+
+        // Draw to Step 3
+        .to("#flow-path-line", { strokeDashoffset: 60, duration: 0.2 })
+        .to("#flow-step-3", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-3", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-3", { opacity: 1, y: 0, duration: 0.1 }, "<")
+
+        // Draw to Step 4
+        .to("#flow-path-line", { strokeDashoffset: 40, duration: 0.2 })
+        .to("#flow-step-4", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-4", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-4", { opacity: 1, y: 0, duration: 0.1 }, "<")
+
+        // Draw to Step 5
+        .to("#flow-path-line", { strokeDashoffset: 20, duration: 0.2 })
+        .to("#flow-step-5", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-5", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-5", { opacity: 1, y: 0, duration: 0.1 }, "<")
+
+        // Draw to Step 6
+        .to("#flow-path-line", { strokeDashoffset: 0, duration: 0.2 })
+        .to("#flow-step-6", { opacity: 1, width: "48px", height: "48px", backgroundColor: "#4A4D4A", color: "#ffffff", borderColor: "#4A4D4A", duration: 0.1 })
+        .to("#flow-num-6", { opacity: 1, duration: 0.05 }, "<")
+        .to("#flow-detail-6", { opacity: 1, y: 0, duration: 0.1 }, "<");
+    });
+
+    // MOBILE animations (width < 768px)
+    mm.add("(max-width: 767px)", () => {
+      // 1. Mobile Features Stagger
+      gsap.from(".features-track > div", {
+        opacity: 0,
+        y: 30,
+        stagger: 0.1,
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: "#features",
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      });
+    });
+
+    return () => mm.revert();
   }, []);
-
-  useEffect(() => {
-    createsession();
-  }, []);
-  /* ── data ── */
-  const features = [
-    
-    {
-      ico: "⚡",
-      title: "Global CDN Delivery",
-      desc: "Files served from 300+ edge nodes. Blazing-fast downloads anywhere in the world, every time.",
-      badge: "Speed",
-      badgeBg: "#DBEAFE",
-      badgeTx: "#0284C7",
-      stripe: "#0284C7",
-      bg: "#EFF6FF",
-    },
-    {
-      ico: "🤝",
-      title: "Real-Time Collaboration",
-      desc: "Share folders, set permissions, and co-edit with your team without version conflicts.",
-      badge: "Teamwork",
-      badgeBg: "#F3E8FF",
-      badgeTx: "#7C3AED",
-      stripe: "#7C3AED",
-      bg: "#FAF5FF",
-    },
-    {
-      ico: "📦",
-      title: "One-Click Import",
-      desc: "Migrate from Google Drive, Dropbox or OneDrive in minutes — folder structure preserved.",
-      badge: "Migration",
-      badgeBg: "#FEF9C3",
-      badgeTx: "#D97706",
-      stripe: "#D97706",
-      bg: "#FEFCE8",
-    },
-    // {
-    //   ico: "📱",
-    //   title: "Every Device",
-    //   desc: "Native iOS, Android, macOS and Windows apps. Offline-capable and always in sync.",
-    //   badge: "Cross-Platform",
-    //   badgeBg: "#FCE7F3",
-    //   badgeTx: "#DB2777",
-    //   stripe: "#DB2777",
-    //   bg: "#FDF2F8",
-    // },
-    // {
-    //   ico: "♻️",
-    //   title: "Full Version History",
-    //   desc: "Roll back any file to any point in time. Every change is saved — nothing ever lost.",
-    //   badge: "Recovery",
-    //   badgeBg: "#FEE2E2",
-    //   badgeTx: "#DC2626",
-    //   stripe: "#DC2626",
-    //   bg: "#FFF5F5",
-    // },
-  ];
-
-  const plans = [
-    {
-      name: "Free",
-      desc: "For personal use",
-      price: "0",
-      period: "/mo",
-      perks: [
-        "10 GB storage",
-        "Up to 2 GB per file",
-        "Share with 5 people",
-        "Google Drive import",
-      ],
-      btn: "Get Started Free",
-      btnCls: "plan-btn-light",
-      featured: false,
-    },
-    {
-      name: "Pro",
-      desc: "For power users",
-      price: "9",
-      period: "/mo",
-      perks: [
-        "1 TB storage",
-        "Up to 50 GB per file",
-        "Unlimited sharing",
-        "Priority support",
-        "Advanced analytics",
-        "Password links",
-      ],
-      btn: "Start 14-Day Trial",
-      btnCls: "plan-btn-dark",
-      featured: true,
-    },
-    {
-      name: "Team",
-      desc: "For growing teams",
-      price: "24",
-      period: "/mo per user",
-      perks: [
-        "5 TB shared storage",
-        "Up to 500 GB per file",
-        "Admin & audit logs",
-
-        "SSO & 2FA",
-        "Account manager",
-        "Custom branding",
-      ],
-      btn: "Contact Sales",
-      btnCls: "plan-btn-light",
-      featured: false,
-    },
-  ];
-
-  const testimonials = [
-    {
-      stars: 5,
-      text: "CloudVault completely replaced Dropbox for our 40-person studio. Upload speeds are night and day — and the UI is beautiful.",
-      name: "Marcus R.",
-      role: "Creative Director, Studio8",
-      color: "#7C3AED",
-    },
-    {
-      stars: 5,
-      text: "The folder-level permissions and real-time collaboration are exactly what we needed. Setting up took minutes.",
-      name: "Sarah K.",
-      role: "Product Manager, TechFlow",
-      color: "#0284C7",
-    },
-    {
-      stars: 5,
-      text: "Moved 800 GB from Google Drive in under two hours. Zero data loss. The encryption gives me total peace of mind.",
-      name: "Dev P.",
-      role: "Independent Consultant",
-      color: "#16A34A",
-    },
-  ];
 
   const faqs = [
     {
-      q: "Is my data actually private?",
-      a: "Yes. All files are encrypted with AES-256 before leaving your device. We use zero-knowledge encryption — our engineers cannot access your data or keys.",
+      q: "What is CloudVault?",
+      a: "CloudVault is a secure, high-fidelity MERN stack cloud storage management system. It provides seamless file storage, Google Drive picker integrations, and robust JWT session security."
     },
     {
-      q: "Can I import from Google Drive?",
-      a: "Absolutely. Our one-click importer moves all files, folders, and shared items from Google Drive, Dropbox, OneDrive and Box, preserving folder structure exactly.",
+      q: "How does the Google Picker integration work?",
+      a: "With our native Google Picker API integration, you can log into Google OAuth directly, browse files inside your Google Drive, and import them with a single click."
     },
     {
-      q: "What happens if I hit my storage limit?",
-      a: "Uploads pause at 100% — no data is deleted. You'll receive email notifications as you approach the limit so you can upgrade in time.",
+      q: "Can I restore files after deleting them?",
+      a: "Yes! Deleting a file moves it to the Trash folder. Items in the Trash can be restored within 30 days. After 30 days, they are permanently removed automatically."
     },
     {
-      q: "Is there a free trial for Pro?",
-      a: "Yes — every new account gets a 14-day Pro trial with no credit card required. Downgrade to Free at any time.",
-    },
-    {
-      q: "Does CloudVault work offline?",
-      a: "Our desktop and mobile apps support offline mode. Files you've marked for offline use are cached locally and sync when you reconnect.",
-    },
-  ];
-
-  const mockFiles = [
-    {
-      ico: "🎨",
-      name: "Design System v2.fig",
-      pct: 85,
-      size: "24.3 MB",
-      color: "#7C3AED",
-    },
-    {
-      ico: "📊",
-      name: "Q4 Financial Report.xlsx",
-      pct: 45,
-      size: "8.7 MB",
-      color: "#16A34A",
-    },
-    {
-      ico: "🎬",
-      name: "Campaign Video.mp4",
-      pct: 95,
-      size: "428 MB",
-      color: "#DB2777",
-    },
-    {
-      ico: "📄",
-      name: "Product Roadmap.pdf",
-      pct: 30,
-      size: "3.2 MB",
-      color: "#DC2626",
-    },
-    {
-      ico: "📁",
-      name: "Brand Assets /",
-      pct: 70,
-      size: "1.2 GB",
-      color: "#0284C7",
-    },
+      q: "What are the storage limits for each tier?",
+      a: "Our Basic (Free) plan includes 1 GB of storage. Upgrading to the Pro plan expands your storage to 5 GB. Enterprise plans provide unlimited custom storage solutions."
+    }
   ];
 
   return (
-    <>
-      <style>{LAND_CSS}</style>
+    <div className="min-h-screen bg-[#FAFAFA] font-sans antialiased text-[#1A1C1A] selection:bg-[#4A4D4A]/10 selection:text-[#1A1C1A]">
+      {/* Sticky Header */}
+      <nav
+        className={`fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300 ${scrolled
+            ? "bg-[#FAFAFA]/80 backdrop-blur-md border-b border-[#EBEAEA] shadow-sm"
+            : "bg-transparent"
+          }`}
+      >
+        <Link to="/" className="flex items-center gap-2 text-lg font-bold text-[#2E302E]">
+          <span className="text-xl">☁️</span>
+          <span>CloudVault</span>
+        </Link>
 
-      {/* ── NAV ── */}
-      <nav className={`lnav ${scrolled ? "scrolled" : ""}`}>
-        <a className="lnav-logo" href="#">
-          <span className="lnav-logo-ico">☁️</span> CloudVault
-        </a>
-        <div className="lnav-links">
-          {[
-            ["Features", "#features"],
-            ["Pricing", "#pricing"],
-            ["How It Works", "#how"],
-            ["FAQ", "#faq"],
-          ].map(([l, h]) => (
-            <a key={l} className="lnav-link" href={h}>
-              {l}
-            </a>
-          ))}
+        <div className="hidden md:flex items-center gap-8">
+          <a href="#features" className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+            Features
+          </a>
+          <a href="#flow" className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+            How It Works
+          </a>
+          <a href="#pricing" className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+            Pricing
+          </a>
+          <a href="#faq" className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+            FAQ
+          </a>
         </div>
-        <div className="lnav-acts">
-          <button className="ln-btn ln-ghost">
-            <Link to={"/login"} className="">
-              Sign In
-            </Link>
-          </button>
-          <button className="ln-btn ln-solid">
-            <Link to={"/Register"}>Get Started Free</Link>
-          </button>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="px-4 py-2 border border-gray-200 hover:bg-[#F4F3F3] hover:text-black transition-colors rounded-lg font-semibold text-xs text-gray-700"
+          >
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            className="px-4 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] transition-all text-white rounded-lg font-semibold text-xs shadow-sm hover:shadow"
+          >
+            Get Started Free
+          </Link>
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="hero">
-        {/* CSS gradient orbs — behind everything */}
-        <div className="hero-orbs">
-          <div className="hero-orb hero-orb-1" />
-          <div className="hero-orb hero-orb-2" />
-          <div className="hero-orb hero-orb-3" />
-          <div className="hero-orb hero-orb-4" />
-          <div className="hero-orb hero-orb-5" />
-        </div>
-        {/* 2D canvas for animated gradient circles */}
-        <canvas ref={canvasRef} id="cv-canvas" />
-
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            New — Google Drive import now live
-          </div>
-          <h1 className="hero-h1">
-            Cloud storage
-            <br />
-            built for <em>speed</em>
-            <br />
-            and privacy.
-          </h1>
-          <p className="hero-sub ">
-            CloudVault is the modern cloud storage platform that's fast,
-            beautiful, and end-to-end encrypted. Store, share, and collaborate
-            on anything — from anywhere.
-          </p>
-          <div className="hero-ctas">
-            <button className="ln-btn ln-solid ln-hero" onClick={onSignup}>
-              Start Free — No Credit Card
-            </button>
-            <button className="ln-btn ln-ghost ln-hero" onClick={onLogin}>
-              Sign In to Dashboard →
-            </button>
-          </div>
-          <div className="hero-proof">
-            {[
-              "No credit card required",
-              "14-day Pro trial",
-              "Cancel anytime",
-            ].map((t, i) => (
-              <span key={t} className="hero-proof-item">
-                {i > 0 && <span className="hero-proof-dot" />}
-                <span>✓</span> {t}
-              </span>
-            ))}
-          </div>
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-28 pb-20 px-6 overflow-hidden">
+        {/* Animated background circles */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full filter blur-[120px] opacity-25 bg-gradient-to-tr from-blue-300 via-indigo-200 to-purple-300 animate-pulse-glow"></div>
+          <div className="absolute top-[20%] left-[20%] w-[350px] h-[350px] rounded-full filter blur-[80px] opacity-15 bg-emerald-200"></div>
+          <div className="absolute top-[60%] left-[75%] w-[500px] h-[500px] rounded-full filter blur-[100px] opacity-15 bg-amber-200"></div>
         </div>
 
-        {/* <div className="hero-stats">
-          {[
-            ["2.4M+", "Files stored daily"],
-            ["99.99%", "Uptime SLA"],
-            ["300+", "Edge locations"],
-            ["AES-256", "Encryption"],
-          ].map(([v, l]) => (
-            <div key={l} className="hero-stat">
-              <div className="hero-stat-val">{v}</div>
-              <div className="hero-stat-lbl">{l}</div>
-            </div>
-          ))}
-        </div> */}
-      </section>
+        <div className="relative z-10 max-w-6xl w-full text-center flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full shadow-sm text-[11px] font-semibold text-gray-600 mb-8 animate-slide-up">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            <span>CloudVault SaaS 2.0 is Live</span>
+          </div>
 
-      {/* ── LOGO BAR ──
-      <div className="logo-bar">
-        <div className="logo-track">
-          {[
-            "Trusted by teams at",
-            "Stripe",
-            "Shopify",
-            "Figma",
-            "Notion",
-            "Vercel",
-            "Linear",
-            "Loom",
-            "Zapier",
-            "Framer",
-            "Raycast",
-            "Trusted by teams at",
-            "Stripe",
-            "Shopify",
-            "Figma",
-            "Notion",
-            "Vercel",
-            "Linear",
-            "Loom",
-            "Zapier",
-            "Framer",
-            "Raycast",
-          ].map((n, i) => (
-            <span key={i} className="logo-item">
-              {n}
+          <h1 className="text-4xl md:text-6xl font-extrabold text-[#1A1C1A] tracking-tight leading-[1.1] mb-6 animate-slide-up">
+            Secure, modern storage <br />
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              for your files.
             </span>
-          ))}
-        </div>
-      </div> */}
+          </h1>
 
-      <div className="screenshot w-screen h-[110vh]  flex items-center justify-center">
-        <div className="main w-[75%] h-[75%] bg-white rounded-xl overflow-hidden shadow-2xl">
-          
-          <div className="flex items-center justify-start gap-[33vw]  w-full h-12 bg-gray-200 ">
-            <div className="flex items-center justify-center gap-2 w-16 h-3 ">
-              <div className="w-3 h-3 bg-red-400 rounded-full "></div>
-              <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-            </div>
+          <p className="text-base md:text-lg text-gray-500 font-medium max-w-2xl mb-10 leading-relaxed animate-slide-up">
+            Organize, share, and manage your assets with a beautiful, high-fidelity SaaS interface.
+            Native Google Picker integrations, full CRUD folders, star-rating favorites, and instant trash recovery.
+          </p>
 
-            <div className=" text-[12px] text-gray-500 bg-gray-300 rounded-xl shadow-2xl w-40 h-6 flex items-center justify-center">
-              app.CloudVault.cloud
-            </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-16 animate-slide-up">
+            <Link
+              to="/register"
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#4A4D4A] hover:bg-[#2E302E] transition-all text-white text-sm font-semibold rounded-xl shadow-md hover:shadow-lg"
+            >
+              Get Started Free (1 GB)
+            </Link>
+            <a
+              href="#features"
+              className="w-full sm:w-auto px-8 py-3.5 border border-gray-200 bg-white hover:bg-[#F4F3F3] text-gray-700 transition-colors text-sm font-semibold rounded-xl"
+            >
+              Learn More
+            </a>
           </div>
-          <div className="img w-full h-[76vh] bg-blue-700">
-            <img src="/landing-ui.png" className="w-full h-full"></img>
-          </div>
-        </div>
-      </div>
 
-      {/* ── FEATURES ── */}
-      <section className="lsec" id="features">
-        <div className="lsec-inner">
-          <div style={{ textAlign: "center" }}>
-            <div className="lsec-label" style={{ justifyContent: "center" }}>
-              Features
-            </div>
-            <h2 className="lsec-h" style={{ textAlign: "center" }}>
-              Everything you need.
-              <br />
-              Nothing you don't.
-            </h2>
-            <p className="lsec-sub" style={{ margin: "0 auto" }}>
-              Built for people and teams who demand the best from their cloud
-              storage.
-            </p>
-          </div>
-          <div className="feat-grid">
-            {features.map((f, i) => (
-              <div key={i} className="feat-card">
-                <div
-                  className="feat-card-stripe"
-                  style={{ background: f.stripe }}
-                />
-                <div
-                  className="feat-ico"
-                  style={{ background: f.bg, borderColor: f.stripe + "30" }}
-                >
-                  {f.ico}
+          {/* Premium UI Mockup - Enlarged to max-w-5xl to replicate Home dashboard layout exactly */}
+          <div className="w-full max-w-5xl border border-gray-200/80 bg-white/70 backdrop-blur-md shadow-[0_20px_60px_-20px_rgba(0,0,0,0.15)] rounded-2xl p-3 animate-slide-up">
+            <div className="w-full bg-white border border-[#EBEAEA] rounded-xl overflow-hidden shadow-inner flex flex-col">
+              {/* Mockup header */}
+              <div className="w-full h-11 border-b border-[#EBEAEA] bg-gray-50/50 flex items-center justify-between px-4">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
                 </div>
-                <div className="feat-title">{f.title}</div>
-                <div className="feat-desc">{f.desc}</div>
-                <div
-                  className="feat-badge"
-                  style={{ background: f.badgeBg, color: f.badgeTx }}
-                >
-                  {f.badge}
+                <div className="text-[11px] font-semibold text-gray-400 select-none">
+                  cloudvault.app/drive
                 </div>
+                <div className="w-10"></div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="lsec" id="how">
-        <div className="lsec-inner">
-          <div style={{ textAlign: "center" }}>
-            <div className="lsec-label" style={{ justifyContent: "center" }}>
-              How It Works
-            </div>
-            <h2 className="lsec-h" style={{ textAlign: "center" }}>
-              Up and running in 60 seconds
-            </h2>
-          </div>
-          <div className="steps">
-            {[
-              {
-                n: "01",
-                title: "Create account",
-                desc: "Sign up free with email or Google. No credit card needed ever.",
-              },
-              {
-                n: "02",
-                title: "Upload or import",
-                desc: "Drag & drop files or import everything from Google Drive in one click.",
-              },
-              {
-                n: "03",
-                title: "Organize & share",
-                desc: "Create folders, star favorites, share with custom permissions.",
-              },
-              // {
-              //   n: "04",
-              //   title: "Access anywhere",
-              //   desc: "Synced across all devices, available offline too.",
-              // },
-            ].map((s, i) => (
-              <div key={i} className="step">
-                <div className="step-num">{s.n}</div>
-                <div className="step-title">{s.title}</div>
-                <div className="step-desc">{s.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SHOWCASE ── */}
-      <section
-        className="lsec"
-        style={{
-          background:
-            "linear-gradient(180deg,var(--bg) 0%,var(--surf) 50%,var(--bg) 100%)",
-          padding: "80px 6%",
-        }}
-      >
-        <div className="lsec-inner">
-          <div className="showcase">
-            <div>
-              <div className="lsec-label">Smart Storage</div>
-              <h2 className="lsec-h">
-                Your files, organized the way you think
-              </h2>
-              <p
-                style={{
-                  fontSize: 15,
-                  color: "var(--tx2)",
-                  lineHeight: 1.75,
-                  marginBottom: 26,
-                }}
-              >
-                CloudVault learns from how you work. Instant search,
-                auto-tagging, and smart folders mean you spend less time hunting
-                and more time doing.
-              </p>
-              {[
-                ["⚡", "Instant full-text search across all files"],
-                ["🏷️", "Auto-tag and categorize uploads automatically"],
-                ["🔗", "Shareable links with custom expiry dates"],
-                ["📊", "Usage analytics and storage breakdowns"],
-              ].map(([ico, txt]) => (
-                <div
-                  key={txt}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 11,
-                    marginBottom: 13,
-                    fontSize: 13.5,
-                    color: "var(--tx2)",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      background: "var(--surf2)",
-                      border: "1.5px solid var(--bdr)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 15,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {ico}
+              {/* Mockup content panel */}
+              <div className="flex h-[420px] text-left text-[#1A1C1A] select-none">
+                {/* Mockup Sidebar - Matched exactly with Home.jsx */}
+                <div className="w-52 border-r border-[#EBEAEA] p-3 flex flex-col bg-white shrink-0">
+                  {/* Mockup Logo */}
+                  <div className="flex items-center gap-2 h-10 font-bold pl-2 text-xs text-[#2E302E] mb-3">
+                    <img src="/logo.png" className="w-5 h-5" alt="Logo" onError={(e) => { e.target.style.display = 'none'; }} />
+                    <span>CloudVault</span>
                   </div>
-                  {txt}
-                </div>
-              ))}
-              <button
-                className="ln-btn ln-solid"
-                style={{ marginTop: 10 }}
-                onClick={onSignup}
-              >
-                Try it free →
-              </button>
-            </div>
 
-            <div className="showcase-visual">
-              <div className="mock-topbar">
-                <span className="mock-dot-r" />
-                <span className="mock-dot-y" />
-                <span className="mock-dot-g" />
-                <span className="mock-titlebar">CloudVault — My Files</span>
-              </div>
-              {mockFiles.map((f, i) => (
-                <div key={i} className="mock-file">
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>{f.ico}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="mock-fname">{f.name}</div>
-                    <div className="mock-pbar">
-                      <div
-                        className="mock-pfill"
-                        style={{ width: `${f.pct}%`, background: f.color }}
+                  {/* Mockup Sidebar Action Buttons */}
+                  <div className="flex flex-col gap-2 mb-4">
+                    <button className="w-full h-8 bg-[#4A4D4A] text-white rounded-lg flex items-center justify-center gap-2 text-[10.5px] font-bold">
+                      <FiUploadCloud className="text-[11px]" />
+                      Upload Files
+                    </button>
+                    <button className="w-full h-8 border border-[#b9b7b7] hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 text-[10.5px] text-gray-700">
+                      <FiFolderPlus className="text-gray-500 text-xs" />
+                      New Folder
+                    </button>
+                    <button className="w-full h-8 border border-[#b9b7b7] hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 text-[10.5px] text-gray-700">
+                      <img src="/google-drive.png" className="w-3.5 h-3.5" alt="" onError={(e) => { e.target.style.display = 'none'; }} />
+                      Import From Drive
+                    </button>
+                  </div>
+
+                  {/* Navigation List */}
+                  <h6 className="text-[8px] text-[#898a89] tracking-[1.5px] font-bold mb-1 pl-2">
+                    NAVIGATION
+                  </h6>
+                  <div className="flex flex-col gap-0.5 mb-4">
+                    <div className="h-7 bg-[#EBEAEA] border border-[#ababab] text-gray-800 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <span className="text-blue-600 font-bold">🏠</span> Dashboard
+                    </div>
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiFolder className="text-gray-400" /> My Files
+                    </div>
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiClock className="text-gray-400" /> Recent
+                    </div>
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiStar className="text-orange-400" /> Favorites
+                    </div>
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiShare2 className="text-blue-500" /> Shared
+                    </div>
+                  </div>
+
+                  {/* System List */}
+                  <h6 className="text-[8px] text-[#898a89] tracking-[1.5px] font-bold mb-1 pl-2">
+                    SYSTEM
+                  </h6>
+                  <div className="flex flex-col gap-0.5 mb-4">
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiTrash2 className="text-red-500" /> Trash
+                    </div>
+                    <div className="h-7 hover:bg-gray-50 text-gray-500 rounded-lg flex items-center pl-2.5 text-[10.5px] font-semibold gap-2">
+                      <FiSettings className="text-gray-400" /> Settings
+                    </div>
+                  </div>
+
+                  {/* Storage Capacity Widget */}
+                  <div className="mt-auto bg-[#F4F3F3] border border-[#cdcccc] rounded-xl p-2 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between text-[9px] font-bold text-gray-600">
+                      <span>Storage</span>
+                      <span>32.40%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#E0DFDF] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#4CA4E6] rounded-full" style={{ width: "32.4%" }}></div>
+                    </div>
+                    <span className="text-[8px] text-gray-500">3.24 GB of 10 GB used</span>
+                    <button className="w-full h-6 bg-[#707270] hover:bg-black text-white text-[8px] font-bold rounded-lg mt-0.5">
+                      ✨ Upgrade to Pro
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mockup Workspace Pane */}
+                <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
+                  {/* Workspace top Navbar */}
+                  <div className="h-12 border-b border-[#EBEAEA] px-6 flex items-center justify-between shrink-0">
+                    <div className="relative w-72">
+                      <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-gray-400">
+                        <FiSearch className="text-xs" />
+                      </span>
+                      <input
+                        type="text"
+                        disabled
+                        placeholder="Search files, folders..."
+                        className="w-full pl-8 pr-3 py-1.5 bg-gray-50/50 border border-gray-200 rounded-lg text-[10.5px] outline-none placeholder-gray-400"
                       />
                     </div>
-                  </div>
-                  <span className="mock-fmeta">{f.size}</span>
-                </div>
-              ))}
-              <div className="mock-footer">
-                <span>5 items · 462 MB</span>
-                <span style={{ color: "var(--green)", fontWeight: 700 }}>
-                  ↑ Synced
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section
-        className="lsec"
-        id="pricing"
-        style={{ background: "var(--surf)" }}
-      >
-        <div className="lsec-inner">
-          <div style={{ textAlign: "center" }}>
-            <div className="lsec-label" style={{ justifyContent: "center" }}>
-              Pricing
-            </div>
-            <h2 className="lsec-h" style={{ textAlign: "center" }}>
-              Simple, transparent pricing
-            </h2>
-            <p className="lsec-sub" style={{ margin: "0 auto" }}>
-              Start free. Upgrade as you grow. No hidden fees.
-            </p>
-          </div>
-          <div className="pricing-grid">
-            {plans.map((p, i) => (
-              <div
-                key={i}
-                className={`plan-card ${p.featured ? "featured" : ""}`}
-              >
-                {p.featured && (
-                  <div className="plan-top-badge">✦ MOST POPULAR</div>
-                )}
-                <div className="plan-name">{p.name}</div>
-                <div className="plan-desc">{p.desc}</div>
-                <div className="plan-price">
-                  {p.price}$<span>{p.period}</span>
-                </div>
-                <div className="plan-divider" />
-                <div className="plan-perks">
-                  {p.perks.map((pk, j) => (
-                    <div key={j} className="plan-perk">
-                      <span
-                        className="plan-perk-check"
-                        style={{ color: "var(--green)" }}
-                      >
-                        ✓
-                      </span>
-                      {pk}
+                    {/* Mock Profile Avatar */}
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-[10px] flex items-center justify-center border border-white shadow-sm">
+                      YS
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Main Grid View */}
+                  <div className="flex-1 p-6 overflow-y-auto flex flex-col gap-5">
+                    {/* Header */}
+                    <div className="flex justify-between items-center shrink-0">
+                      <h2 className="text-xs font-extrabold text-gray-800">Root Directory</h2>
+                      <span className="text-[9px] px-2 py-0.5 bg-gray-50 border border-gray-150 rounded-full text-gray-400 font-bold">10 GB Capacity Limit</span>
+                    </div>
+
+                    {/* Folders List Row */}
+                    <div>
+                      <h3 className="text-[9px] font-bold text-gray-400 tracking-wider uppercase mb-2">Folders</h3>
+                      <div className="grid grid-cols-3 gap-3 shrink-0">
+                        <div className="border border-[#E0DFDF] p-2 rounded-xl flex items-center justify-between bg-[#FAFAFA]/50 hover:bg-white transition-all cursor-pointer">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-base flex-shrink-0">📁</span>
+                            <div className="min-w-0">
+                              <h4 className="text-[10px] font-bold text-gray-700 truncate leading-none mb-0.5">Documents</h4>
+                              <span className="text-[8px] text-gray-400 font-medium">24 Files</span>
+                            </div>
+                          </div>
+                          <span className="text-gray-300 text-xs">⋮</span>
+                        </div>
+                        <div className="border border-[#E0DFDF] p-2 rounded-xl flex items-center justify-between bg-[#FAFAFA]/50 hover:bg-white transition-all cursor-pointer">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-base flex-shrink-0">📁</span>
+                            <div className="min-w-0">
+                              <h4 className="text-[10px] font-bold text-gray-700 truncate leading-none mb-0.5">Images</h4>
+                              <span className="text-[8px] text-gray-400 font-medium">18 Files</span>
+                            </div>
+                          </div>
+                          <span className="text-gray-300 text-xs">⋮</span>
+                        </div>
+                        <div className="border border-[#E0DFDF] p-2 rounded-xl flex items-center justify-between bg-[#FAFAFA]/50 hover:bg-white transition-all cursor-pointer">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-base flex-shrink-0">📁</span>
+                            <div className="min-w-0">
+                              <h4 className="text-[10px] font-bold text-gray-700 truncate leading-none mb-0.5">Videos</h4>
+                              <span className="text-[8px] text-gray-400 font-medium">6 Files</span>
+                            </div>
+                          </div>
+                          <span className="text-gray-300 text-xs">⋮</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Files List Table */}
+                    <div className="flex-1 flex flex-col min-h-0">
+                      <h3 className="text-[9px] font-bold text-gray-400 tracking-wider uppercase mb-2">Recent Files</h3>
+                      <div className="flex-1 border border-gray-150 rounded-xl overflow-hidden bg-white text-[10px] flex flex-col min-h-0">
+                        {/* Table Header */}
+                        <div className="h-8 bg-gray-50 flex items-center px-4 justify-between text-gray-400 border-b border-gray-150 font-bold select-none shrink-0">
+                          <span className="w-[50%]">Name</span>
+                          <span className="w-[18%]">Size</span>
+                          <span className="w-[18%]">Type</span>
+                          <span className="w-[14%] text-right">Shared</span>
+                        </div>
+                        {/* Table Body */}
+                        <div className="flex-1 overflow-y-auto">
+                          <div className="h-8 flex items-center px-4 justify-between text-gray-600 hover:bg-gray-50/50 border-b border-gray-100 transition-colors">
+                            <span className="w-[50%] truncate font-bold text-gray-700 flex items-center gap-1.5">
+                              <FiFileText className="text-blue-500 text-xs shrink-0" />
+                              monthly_report.pdf
+                            </span>
+                            <span className="w-[18%] text-gray-400">1.4 MB</span>
+                            <span className="w-[18%] text-gray-400 font-medium">PDF</span>
+                            <span className="w-[14%] text-right text-blue-500 font-bold">🔗 Yes</span>
+                          </div>
+                          <div className="h-8 flex items-center px-4 justify-between text-gray-600 hover:bg-gray-50/50 border-b border-gray-100 transition-colors">
+                            <span className="w-[50%] truncate font-bold text-gray-700 flex items-center gap-1.5">
+                              <FiImage className="text-emerald-500 text-xs shrink-0" />
+                              banner_v2.png
+                            </span>
+                            <span className="w-[18%] text-gray-400">2.8 MB</span>
+                            <span className="w-[18%] text-gray-400 font-medium">PNG</span>
+                            <span className="w-[14%] text-right text-gray-300">—</span>
+                          </div>
+                          <div className="h-8 flex items-center px-4 justify-between text-gray-600 hover:bg-gray-50/50 transition-colors">
+                            <span className="w-[50%] truncate font-bold text-gray-700 flex items-center gap-1.5">
+                              <FiVideo className="text-purple-500 text-xs shrink-0" />
+                              demo_recording.mp4
+                            </span>
+                            <span className="w-[18%] text-gray-400">15.2 MB</span>
+                            <span className="w-[18%] text-gray-400 font-medium">MP4</span>
+                            <span className="w-[14%] text-right text-blue-500 font-bold">🔗 Yes</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Floating active file upload progress widget - matched layout inside Home.jsx */}
+                  <div className="absolute bottom-4 right-4 z-20 w-60 bg-white/90 backdrop-blur-md border border-gray-200/80 shadow-lg rounded-xl overflow-hidden">
+                    <div className="h-8 border-b border-gray-100 flex items-center justify-between px-3 bg-gray-50/50">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                        <h4 className="text-[9px] font-bold text-gray-600">Uploading File</h4>
+                      </div>
+                      <button className="text-[9px] text-red-500 hover:bg-red-50 px-1.5 py-0.5 rounded font-bold">
+                        Cancel
+                      </button>
+                    </div>
+                    <div className="p-2.5 flex flex-col gap-1.5">
+                      <div className="flex items-start gap-2">
+                        <span className="text-base leading-none shrink-0">📄</span>
+                        <div className="min-w-0 flex-1">
+                          <h5 className="text-[9.5px] font-bold text-gray-700 truncate leading-none mb-0.5">design_specs.fig</h5>
+                          <span className="text-[8px] text-gray-400">4.8 MB</span>
+                        </div>
+                        <span className="text-[9px] font-bold text-blue-600">68%</span>
+                      </div>
+                      <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: "68%" }}></div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
-                <button
-                  className={`plan-btn ${p.btnCls}`}
-                  onClick={i === 2 ? () => {} : onSignup}
-                >
-                  {p.btn}
-                </button>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      {/* <section className="lsec">
-        <div className="lsec-inner">
-          <div style={{ textAlign: "center" }}>
-            <div className="lsec-label" style={{ justifyContent: "center" }}>
-              Testimonials
-            </div>
-            <h2 className="lsec-h" style={{ textAlign: "center" }}>
-              Loved by teams worldwide
-            </h2>
-          </div>
-          <div className="testi-grid">
-            {testimonials.map((t, i) => (
-              <div key={i} className="testi-card">
-                <div className="testi-stars">{"★".repeat(t.stars)}</div>
-                <div className="testi-text">"{t.text}"</div>
-                <div className="testi-author">
-                  <div className="testi-av" style={{ background: t.color }}>
-                    {t.name[0]}
+      {/* Features Section with GSAP Horizontal Pin Animation */}
+      <section className="md:h-screen bg-white border-y border-[#EBEAEA] overflow-hidden flex flex-col justify-center relative w-full py-16 md:py-0" id="features">
+
+        {/* Centered Heading at the Top */}
+        <div className="max-w-6xl mx-auto px-6 w-full text-center mb-10 md:mb-14 shrink-0">
+          <span className="text-[#4A4D4A] text-xs uppercase tracking-widest font-bold">Deep Features</span>
+          <h2 className="text-3xl lg:text-4xl font-extrabold tracking-tight mt-3 text-[#1A1C1A] leading-tight">
+            Engineered for seamless file management.
+          </h2>
+          <p className="text-xs text-gray-400 mt-3 leading-relaxed font-semibold max-w-xl mx-auto">
+            Explore our core features. Everything you need to securely scale, sync, and organize your cloud storage.
+          </p>
+        </div>
+
+        {/* Sliding Cards Container (Spans full 100vw screen width, slides edge-to-edge) */}
+        <div className="w-full overflow-x-auto md:overflow-hidden hide-scrollbar flex items-center relative py-4">
+          <div className="features-track flex gap-6 flex-nowrap shrink-0 px-6 md:px-[calc((100vw-1100px)/2)]">
+
+            {/* 1. Folder Management */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiFolder />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">Folder Management</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Create directories, rename folders, delete, and restore items. Built on top of robust MongoDB relationships.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none">
+                <div className="flex items-center justify-between text-[10px] font-bold text-gray-400 pb-2 border-b border-gray-200">
+                  <span>Directory tree</span>
+                  <span className="text-blue-500 font-extrabold">+ New Folder</span>
+                </div>
+                <div className="flex flex-col gap-1.5 text-xs text-gray-700 font-bold">
+                  <div className="flex items-center gap-2 p-1.5 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <span className="text-blue-500">📁</span>
+                    <span>root</span>
                   </div>
-                  <div>
-                    <div className="testi-name">{t.name}</div>
-                    <div className="testi-role">{t.role}</div>
+                  <div className="flex items-center gap-2 p-1.5 pl-6 bg-white border border-gray-150 rounded-lg">
+                    <span className="text-blue-400">📁</span>
+                    <span>documents</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 pl-10 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg animate-pulse">
+                    <span className="text-blue-500">📁</span>
+                    <span>project_assets/</span>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* 2. OAuth 2.0 Security */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiShield />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">OAuth 2.0 Security</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Google OAuth integration and secure JSON Web Token (JWT) session cookies protect your files from unauthorized access.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none items-center justify-center min-h-[140px]">
+                <div className="w-full max-w-[220px] bg-white border border-gray-250 rounded-xl p-3 flex flex-col gap-2.5 shadow-sm">
+                  <div className="text-[10px] font-extrabold text-gray-400 uppercase text-center">Google Sign In</div>
+                  <div className="flex items-center justify-center gap-2 py-1.5 px-3 border border-gray-250 hover:bg-gray-50 rounded-lg text-xs font-bold text-gray-600 w-full cursor-default">
+                    <span className="text-base">🌐</span>
+                    <span>Sign in with Google</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5 text-[9px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 py-1 rounded-md">
+                    <span>🛡️ JWT Session Signed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Google Picker API */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiUploadCloud />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">Google Picker API</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Import any folder or document directly from your Google Drive account using Google's native cloud picker window.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 border-b border-gray-200 pb-2">
+                  <span className="text-amber-500">☁️</span>
+                  <span>Import from Google Drive</span>
+                </div>
+                <div className="flex flex-col gap-1 text-[11px] font-bold text-gray-650">
+                  <div className="flex items-center justify-between p-1.5 bg-white border border-gray-200 rounded-lg">
+                    <span>📄 presentation.pptx</span>
+                    <span className="text-[9px] text-blue-500">Select</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 bg-white border border-gray-200 rounded-lg">
+                    <span>🎬 final_render.mp4</span>
+                    <span className="text-[9px] text-blue-500">Select</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg">
+                    <span>📁 Assets Folder</span>
+                    <span className="text-[9px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-extrabold">Importing...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Smart Trash Restores */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiTrash2 />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">Smart Trash Restores</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Safely recover deleted files. Deletions are sent to Trash and kept for 30 days before permanent auto-delete triggers.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none">
+                <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 border-b border-gray-200 pb-2">
+                  <span>Trash Can (Auto-purges 30 days)</span>
+                  <span className="text-red-500">Empty Trash</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🗑️</span>
+                    <span>invoice_copy.pdf</span>
+                  </div>
+                  <button className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-extrabold cursor-default border-none">
+                    Restore
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Secure File Sharing */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiShare2 />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">Secure File Sharing</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Generate secure sharing URLs for folders or specific files with simple read/write toggle options to share assets instantly.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none">
+                <div className="text-[10px] font-bold text-gray-400 border-b border-gray-200 pb-2">Share Settings</div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-gray-700">
+                    <span>Link Permission</span>
+                    <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded font-extrabold">Read & Write</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 p-2 bg-white border border-gray-200 rounded-xl">
+                    <input className="text-[9px] text-gray-500 font-semibold truncate bg-transparent border-none outline-none select-all w-full" value="https://cloudvault.app/share/73hskd7" readOnly />
+                    <button className="px-2 py-1 bg-emerald-50 text-emerald-700 text-[9px] font-extrabold rounded-lg whitespace-nowrap cursor-default border-none">Copy link</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Starred Favorites */}
+            <div className="p-6 border border-[#E0DFDF] rounded-3xl bg-white hover:shadow-lg transition-shadow w-[80vw] sm:w-[45vw] md:w-[360px] shrink-0 flex flex-col justify-between min-h-[380px]">
+              <div>
+                <div className="w-10 h-10 bg-yellow-50 text-yellow-500 rounded-xl flex items-center justify-center text-xl mb-4">
+                  <FiStar />
+                </div>
+                <h3 className="text-sm font-extrabold text-gray-800 mb-2">Starred Favorites</h3>
+                <p className="text-[11.5px] text-gray-400 leading-relaxed font-medium mb-4">
+                  Bookmark and keep vital folders and documents accessible. Star items to view them inside your unified favorites panel.
+                </p>
+              </div>
+              {/* Mini UI Illustration */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] select-none">
+                <div className="text-[10px] font-bold text-gray-400 border-b border-gray-200 pb-2">Favorites Panel</div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between p-1.5 bg-white border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+                      <span>⭐</span>
+                      <span>logo_v2.png</span>
+                    </div>
+                    <span className="text-[9px] text-gray-400">1.2 MB</span>
+                  </div>
+                  <div className="flex items-center justify-between p-1.5 bg-white border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-xs font-bold text-gray-700">
+                      <span>⭐</span>
+                      <span>contracts.zip</span>
+                    </div>
+                    <span className="text-[9px] text-gray-400">12.5 MB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section> */}
+      </section>
 
-      {/* ── FAQ ── */}
-      {/* <section className="lsec" id="faq" style={{ background: "var(--surf)" }}>
-        <div className="lsec-inner">
-          <div style={{ textAlign: "center" }}>
-            <div className="lsec-label" style={{ justifyContent: "center" }}>
-              FAQ
+      {/* How It Works Section */}
+      <section className="bg-[#FAFAFA] pt-0 pb-24" id="flow">
+        <div className="max-w-4xl mx-auto px-6 w-full flex flex-col relative">
+
+          {/* Unified Vertical Serpentine Infographic */}
+          <div className="relative w-full max-w-4xl mx-auto h-[1440px] pt-0 pb-10">
+
+            {/* SVG Connector Path */}
+            <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+              <svg id="flow-svg-serpentine" className="w-full h-full" viewBox="0 0 100 1440" preserveAspectRatio="none" fill="none">
+                <path
+                  id="flow-svg-serpentine-track"
+                  d="M 50,120 C 15,240 15,240 50,360 C 85,480 85,480 50,600 C 15,720 15,720 50,840 C 85,960 85,960 50,1080 C 15,1200 15,1200 50,1320"
+                  stroke="#E5E7EB"
+                  strokeWidth="1.5"
+                  pathLength="100"
+                />
+                <path
+                  id="flow-path-line"
+                  d="M 50,120 C 15,240 15,240 50,360 C 85,480 85,480 50,600 C 15,720 15,720 50,840 C 85,960 85,960 50,1080 C 15,1200 15,1200 50,1320"
+                  stroke="#4A4D4A"
+                  strokeWidth="2.5"
+                  strokeDasharray="100"
+                  strokeDashoffset="100"
+                  pathLength="100"
+                />
+              </svg>
             </div>
-            <h2 className="lsec-h" style={{ textAlign: "center" }}>
-              Got questions?
+
+            {/* Vertical Flow Steps (6 rows of 240px with Centered Circles) */}
+            <div className="grid grid-rows-6 h-full relative z-10">
+
+              {/* Step 1 (Right circle peak turn, but centered circle loop) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div id="flow-detail-1" className="text-right flex flex-col items-end">
+                  <span className="text-xs font-bold text-gray-400">STEP 1</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Sign Up</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Create your account with secure credentials to activate your cloud allocation.
+                  </p>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-1"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-1">1</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-start">
+                  {/* Large Register Mockup */}
+                  <div className="bg-white border border-gray-150 rounded-2xl p-4 flex flex-col gap-2.5 shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                      <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                      <span className="text-[9.5px] text-gray-400 font-bold ml-1">Register Account</span>
+                    </div>
+                    <div className="h-6 bg-gray-50 border border-gray-100 rounded-lg w-full flex items-center px-2 text-[9.5px] text-gray-400">username@email.com</div>
+                    <div className="h-6 bg-[#4A4D4A] rounded-lg w-full flex items-center justify-center text-[9.5px] text-white font-bold cursor-default">Create Secure Account</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2 (Left loop turn, centered circle loop) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div className="flex justify-end">
+                  {/* Large OTP Mockup */}
+                  <div className="bg-white border border-gray-150 rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px]">
+                    <span className="text-[9.5px] font-bold text-gray-400">Enter Security Code</span>
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 border border-emerald-500 rounded-lg flex items-center justify-center font-extrabold text-xs text-emerald-600">8</div>
+                      <div className="w-8 h-8 border border-emerald-500 rounded-lg flex items-center justify-center font-extrabold text-xs text-emerald-600">2</div>
+                      <div className="w-8 h-8 border border-gray-250 rounded-lg flex items-center justify-center font-extrabold text-xs text-gray-300">•</div>
+                      <div className="w-8 h-8 border border-gray-250 rounded-lg flex items-center justify-center font-extrabold text-xs text-gray-300">•</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-2"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-2">2</span>
+                    </div>
+                  </div>
+                </div>
+                <div id="flow-detail-2" className="text-left flex flex-col items-start">
+                  <span className="text-xs font-bold text-gray-400">STEP 2</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Verify OTP</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Verify your email using our instant one-time-password security flow.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 (Right circle) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div id="flow-detail-3" className="text-right flex flex-col items-end">
+                  <span className="text-xs font-bold text-gray-400">STEP 3</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Select Tier</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Choose our free Basic tier or unlock Pro limits via integrated Razorpay cards.
+                  </p>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-3"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-3">3</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-start">
+                  {/* Large Tier Card Mockup */}
+                  <div className="bg-white border border-gray-150 rounded-2xl p-4 flex items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px]">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[9.5px] font-bold text-gray-800 uppercase tracking-wider">Premium SaaS Tier</span>
+                      <span className="text-[8.5px] text-gray-400 font-medium">5 GB & Razorpay Checkout</span>
+                    </div>
+                    <span className="text-[9.5px] bg-[#4A4D4A] text-white px-2.5 py-1 rounded-full font-bold">$4.99/mo</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4 (Left circle) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div className="flex justify-end">
+                  {/* Large Upload Box Mockup */}
+                  <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px] h-[100px]">
+                    <span className="text-lg">📁</span>
+                    <span className="text-[9.5px] text-gray-400 font-bold">Drag and drop folders to upload</span>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-4"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-4">4</span>
+                    </div>
+                  </div>
+                </div>
+                <div id="flow-detail-4" className="text-left flex flex-col items-start">
+                  <span className="text-xs font-bold text-gray-400">STEP 4</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Import Cloud</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Link Google Drive Picker or drag-and-drop local folders to populate your workspace.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 5 (Right circle) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div id="flow-detail-5" className="text-right flex flex-col items-end">
+                  <span className="text-xs font-bold text-gray-400">STEP 5</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Organize Assets</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Group files into nested directories, tag favorites, and search quickly.
+                  </p>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-5"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-5">5</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-start">
+                  {/* Large Folder Structure Mockup */}
+                  <div className="bg-white border border-gray-150 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px] text-left">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">📂</span>
+                        <span className="text-[10px] font-bold text-gray-700">Client Attachments</span>
+                      </div>
+                      <span className="text-[8.5px] text-gray-400 font-bold">4 Items</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[9px] text-gray-500 pl-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px]">📄</span>
+                        <span>design_spec.docx</span>
+                      </div>
+                      <span>1.8 MB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 6 (Left circle) */}
+              <div className="grid grid-cols-[1fr_120px_1fr] gap-16 items-center h-[240px]">
+                <div className="flex justify-end">
+                  {/* Large Share Toggle Mockup */}
+                  <div className="bg-white border border-gray-150 rounded-2xl p-4 flex flex-col gap-2 shadow-[0_8px_30px_rgb(0,0,0,0.03)] select-none w-full max-w-[300px] text-left">
+                    <div className="text-[9.5px] font-bold text-gray-400 border-b border-gray-100 pb-1.5">Sharing Links</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] text-gray-600 font-semibold truncate w-32">https://cloudvault.app/share/73hskd7</span>
+                      <span className="text-[7.5px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-extrabold">Active</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <div
+                      id="flow-step-6"
+                      className="w-4 h-4 rounded-full border border-[#E0DFDF] bg-white flex items-center justify-center font-extrabold text-sm transition-all duration-300 shadow-sm"
+                    >
+                      <span id="flow-num-6">6</span>
+                    </div>
+                  </div>
+                </div>
+                <div id="flow-detail-6" className="text-left flex flex-col items-start">
+                  <span className="text-xs font-bold text-gray-400">STEP 6</span>
+                  <h3 className="text-base font-extrabold text-gray-800 mt-0.5 mb-1.5">Secure Sharing</h3>
+                  <p className="text-xs text-gray-400 font-semibold max-w-[280px] leading-relaxed">
+                    Create access links instantly with custom read/write toggle permissions.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 bg-white border-t border-[#EBEAEA]" id="pricing">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center max-w-xl mx-auto mb-16">
+            <span className="text-[#4A4D4A] text-xs uppercase tracking-widest font-bold">Pricing Plans</span>
+            <h2 className="text-3xl font-extrabold tracking-tight mt-2 text-[#1A1C1A]">
+              Simple plans for any storage scale.
             </h2>
           </div>
-          <div className="faq-list">
-            {faqs.map((f, i) => (
-              <div key={i} className="faq-item">
-                <div
-                  className="faq-q"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="faq-q-text">{f.q}</span>
-                  <svg
-                    className={`faq-chevron ${openFaq === i ? "open" : ""}`}
-                    width="17"
-                    height="17"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free Plan */}
+            <div className="p-8 border border-[#E0DFDF] rounded-2xl bg-white flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <h3 className="text-sm font-bold text-gray-800 mb-1">Basic (Free)</h3>
+                <span className="text-xs text-gray-400 font-semibold uppercase">Personal use</span>
+                <div className="my-6">
+                  <span className="text-3xl font-extrabold text-[#1A1C1A]">$0</span>
+                  <span className="text-xs text-gray-400 font-semibold"> / month</span>
+                </div>
+                <ul className="flex flex-col gap-3.5 mb-8 text-xs text-gray-500 font-medium border-t border-gray-100 pt-6">
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span><strong>1 GB Storage Limit</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-400 line-through">
+                    <FiCheck className="text-gray-300 text-sm flex-shrink-0" />
+                    <span>Priority upload speeds</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-400 line-through">
+                    <FiCheck className="text-gray-300 text-sm flex-shrink-0" />
+                    <span>Google Picker API integration</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span>30-day trash cleanup schedule</span>
+                  </li>
+                </ul>
+              </div>
+              <Link
+                to="/register"
+                className="w-full py-3 text-center border border-gray-200 hover:bg-[#F4F3F3] text-gray-700 text-xs font-bold rounded-xl transition-all"
+              >
+                Sign Up Free
+              </Link>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="p-8 border-2 border-[#4A4D4A] rounded-2xl bg-[#FAFAFA] flex flex-col justify-between shadow-md relative scale-105">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4A4D4A] text-white text-[9px] uppercase tracking-widest font-extrabold rounded-full">
+                Most Popular
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-800 mb-1">Pro Plan</h3>
+                <span className="text-xs text-blue-600 font-bold uppercase">SaaS 2.0 Power</span>
+                <div className="my-6">
+                  <span className="text-3xl font-extrabold text-[#1A1C1A]">$4.99</span>
+                  <span className="text-xs text-gray-400 font-semibold"> / month</span>
+                </div>
+                <ul className="flex flex-col gap-3.5 mb-8 text-xs text-gray-500 font-medium border-t border-gray-200 pt-6">
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-600 text-sm flex-shrink-0" />
+                    <span><strong>5 GB Storage Limit</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-600 text-sm flex-shrink-0" />
+                    <span>Priority upload speeds</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-600 text-sm flex-shrink-0" />
+                    <span>Google Picker API access</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-600 text-sm flex-shrink-0" />
+                    <span>Star favorites & folder sharing</span>
+                  </li>
+                </ul>
+              </div>
+              <Link
+                to="/register"
+                className="w-full py-3 text-center bg-[#4A4D4A] hover:bg-[#2E302E] text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow"
+              >
+                Upgrade to Pro
+              </Link>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="p-8 border border-[#E0DFDF] rounded-2xl bg-white flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <h3 className="text-sm font-bold text-gray-800 mb-1">Enterprise</h3>
+                <span className="text-xs text-gray-400 font-semibold uppercase">Organizations</span>
+                <div className="my-6">
+                  <span className="text-3xl font-extrabold text-[#1A1C1A]">Custom</span>
+                  <span className="text-xs text-gray-400 font-semibold"> / month</span>
+                </div>
+                <ul className="flex flex-col gap-3.5 mb-8 text-xs text-gray-500 font-medium border-t border-gray-100 pt-6">
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span><strong>Custom / Unlimited Storage</strong></span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span>Dedicated Picker credential setups</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span>SLA Uptime Guarantee</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FiCheck className="text-green-500 text-sm flex-shrink-0" />
+                    <span>24/7 dedicated support representative</span>
+                  </li>
+                </ul>
+              </div>
+              <Link
+                to="/register"
+                className="w-full py-3 text-center border border-gray-200 hover:bg-[#F4F3F3] text-gray-700 text-xs font-bold rounded-xl transition-all"
+              >
+                Contact Sales
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Accordion FAQ Section */}
+      <section className="py-24 bg-[#FAFAFA] border-t border-[#EBEAEA]" id="faq">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <span className="text-[#4A4D4A] text-xs uppercase tracking-widest font-bold">Frequently Asked</span>
+            <h2 className="text-3xl font-extrabold tracking-tight mt-2 text-[#1A1C1A]">
+              Got questions? We've got answers.
+            </h2>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div key={index} className="border border-[#E0DFDF] rounded-xl bg-white overflow-hidden shadow-sm">
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                    className="w-full p-5 flex items-center justify-between text-left font-bold text-gray-800 text-sm cursor-pointer hover:bg-gray-50/50 transition-colors"
                   >
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
+                    <span>{faq.q}</span>
+                    <span className={`text-gray-400 text-lg transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`}>
+                      ＋
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs text-gray-450 font-medium leading-relaxed border-t border-gray-50 pt-3 text-gray-500">
+                      {faq.a}
+                    </div>
+                  )}
                 </div>
-                <div className={`faq-a ${openFaq === i ? "open" : ""}`}>
-                  {f.a}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
-      </section> */}
+      </section>
 
-      {/* ── CTA ── */}
-      {/* <div className="cta-banner">
-        <h2 className="cta-banner-h">Start storing smarter today.</h2>
-        <p className="cta-banner-sub">
-          Join 2.4 million people who trust CloudVault with their most important
-          files.
-        </p>
-        <div className="cta-banner-btns">
-          <button
-            className="ln-btn cta-light"
-            style={{ borderRadius: 10 }}
-            onClick={onSignup}
-          >
-            Create Free Account →
-          </button>
-          <button
-            className="ln-btn cta-outline"
-            style={{ borderRadius: 10 }}
-            onClick={onLogin}
-          >
-            Sign In
-          </button>
-        </div>
-      </div> */}
-
-      {/* ── FOOTER ── */}
-      <footer className="lfooter">
-        <div className="lfooter-top">
+      {/* Footer */}
+      <footer className="bg-white border-t border-[#EBEAEA] py-16 px-6 md:px-12 text-[#1A1C1A]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
-            <div className="lfooter-brand">
+            <div className="flex items-center gap-2 text-lg font-bold text-[#2E302E] mb-4">
               <span>☁️</span> CloudVault
             </div>
-            <div className="lfooter-sub">
+            <p className="text-xs text-gray-400 leading-relaxed font-medium mb-4">
               Modern cloud storage built for speed, privacy, and collaboration.
-            </div>
-            {/* <div style={{ marginTop: 16, fontSize: 12, color: "var(--tx3)" }}>
-              © 2025 CloudVault Inc.
-            </div> */}
+              Organize your workspace in one premium SaaS dashboard.
+            </p>
+            <span className="text-[10px] text-gray-400 font-semibold">
+              © {new Date().getFullYear()} CloudVault Inc. All rights reserved.
+            </span>
           </div>
+
           {[
             {
               title: "Product",
-              links: ["Features", "Pricing", "Changelog", "Roadmap", "Status"],
+              links: ["Features", "Pricing", "Integrations", "Security"],
             },
             {
               title: "Company",
-              links: ["About", "Blog", "Careers", "Press", "Contact"],
+              links: ["About Us", "Careers", "Blog", "Contact"],
             },
             {
               title: "Legal",
-              links: [
-                "Privacy Policy",
-                "Terms of Service",
-                "Cookie Policy",
-                "Security",
-                "GDPR",
-              ],
+              links: ["Privacy Policy", "Terms of Service", "Cookie Settings"],
             },
           ].map((col) => (
             <div key={col.title}>
-              <div className="lfooter-col-title">{col.title}</div>
-              {col.links.map((l) => (
-                <a key={l} className="lfooter-link" href="#">
-                  {l}
-                </a>
-              ))}
+              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4">
+                {col.title}
+              </h4>
+              <ul className="flex flex-col gap-2.5 text-xs font-semibold text-gray-400">
+                {col.links.map((link) => (
+                  <li key={link}>
+                    <a href="#" className="hover:text-[#1A1C1A] transition-colors">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
-        <div className="lfooter-bottom">
-          <div className="lfooter-copy">
-            Built with ♥ for teams who move fast
-          </div>
-          <div className="lfooter-socials">
-            {["𝕏", "in", "gh", "▶"].map((s, i) => (
-              <div key={i} className="lfooter-soc">
-                {s}
-              </div>
-            ))}
+
+        <div className="max-w-6xl mx-auto border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-semibold text-gray-400">
+          <span>Built with ♥ for teams who move fast.</span>
+          <div className="flex gap-4">
+            <a href="#" className="hover:text-black">Twitter</a>
+            <a href="#" className="hover:text-black">GitHub</a>
+            <a href="#" className="hover:text-black">LinkedIn</a>
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
