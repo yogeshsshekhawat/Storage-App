@@ -1,0 +1,13 @@
+services:
+  backend:
+    # Local Build Configuration (useful for local development/testing)
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: storage-backend
+    ports:
+      - "3000:3000"
+    # Loads environment variables from the .env file in the same directory
+    env_file:
+      - ./backend/.env
+    restart: always

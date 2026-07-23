@@ -65,7 +65,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
     <div className="w-full h-full flex flex-col gap-4 overflow-hidden bg-transparent">
       {/* Top Breadcrumbs */}
       <div className="flex items-center justify-between shrink-0 pl-1">
-        <div className="flex items-center gap-1.5 py-1.5 px-3.5 rounded-xl bg-slate-50 border border-slate-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)] select-none">
+        <div className="flex items-center gap-2 py-1.5 px-3.5 rounded-xl bg-white border-2 border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] select-none">
           {Array.isArray(data?.path) ? (
             data.path.map((item, index) => {
               const isLast = index === data.path.length - 1;
@@ -77,7 +77,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
                 <React.Fragment key={index}>
                   {index > 0 && (
                     <svg
-                      className="w-3 h-3 text-gray-300 shrink-0 mx-0.5"
+                      className="w-3 h-3 text-gray-900 shrink-0 mx-0.5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -88,8 +88,8 @@ const MyFiles = ({ url, data, getdata, active }) => {
                   )}
 
                   {isLast ? (
-                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-gray-700 tracking-wide truncate max-w-[160px]">
-                      {index === 0 && <FaFolder className="text-blue-500/80 text-[11px] shrink-0" />}
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-900 tracking-wide truncate max-w-[160px] uppercase">
+                      {index === 0 && <FaFolder className="text-[#2B7FFF] text-[11px] shrink-0" />}
                       {displayName}
                     </span>
                   ) : (
@@ -101,9 +101,9 @@ const MyFiles = ({ url, data, getdata, active }) => {
                           window.location.href = `/directory/root`;
                         }
                       }}
-                      className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-400 hover:text-gray-600 transition-colors cursor-pointer hover:bg-gray-200/50 px-1.5 py-0.5 rounded-md"
+                      className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 hover:text-gray-900 transition-colors cursor-pointer hover:bg-gray-100 px-1.5 py-0.5 rounded-md uppercase"
                     >
-                      {index === 0 && <FaFolder className="text-blue-400/80 text-[11px] shrink-0" />}
+                      {index === 0 && <FaFolder className="text-[#2B7FFF]/80 text-[11px] shrink-0" />}
                       {displayName}
                     </button>
                   )}
@@ -111,8 +111,8 @@ const MyFiles = ({ url, data, getdata, active }) => {
               );
             })
           ) : (
-            <span className="flex items-center gap-1.5 text-[11px] font-bold text-gray-700 tracking-wide">
-              <FaFolder className="text-blue-500/80 text-[11px] shrink-0" />
+            <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-900 tracking-wide uppercase">
+              <FaFolder className="text-[#2B7FFF] text-[11px] shrink-0" />
               Home
             </span>
           )}
@@ -152,32 +152,32 @@ const MyFiles = ({ url, data, getdata, active }) => {
 
       {/* Files Section */}
       <div className="flex-1 min-h-0 flex flex-col gap-2.5">
-        <div className="flex items-center justify-between shrink-0 pl-1">
-          <h2 className="text-[11px] text-gray-400 tracking-[1.5px] font-bold uppercase">
+        <div className="flex items-center justify-between shrink-0 pl-1 text-[#2E302E]">
+          <h2 className="text-[11px] text-gray-900 tracking-[1.5px] font-black uppercase">
             Files
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("list")}
-              className={`w-8 h-8 rounded-lg border transition-all cursor-pointer flex items-center justify-center shadow-sm ${
+              className={`w-8 h-8 rounded-lg border-2 border-gray-900 transition-all cursor-pointer flex items-center justify-center ${
                 viewMode === "list"
-                  ? "bg-white text-[#4A4D4A] border-[#4A4D4A]/30 ring-2 ring-[#4A4D4A]/5"
-                  : "bg-white/70 border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  ? "bg-[#CCFF00] text-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]"
+                  : "bg-white text-gray-400 hover:text-gray-900"
               }`}
               title="List View"
             >
-              <FiList className="text-sm stroke-[2]" />
+              <FiList className="text-sm stroke-[2.5]" />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`w-8 h-8 rounded-lg border transition-all cursor-pointer flex items-center justify-center shadow-sm ${
+              className={`w-8 h-8 rounded-lg border-2 border-gray-900 transition-all cursor-pointer flex items-center justify-center ${
                 viewMode === "grid"
-                  ? "bg-white text-[#4A4D4A] border-[#4A4D4A]/30 ring-2 ring-[#4A4D4A]/5"
-                  : "bg-white/70 border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  ? "bg-[#CCFF00] text-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]"
+                  : "bg-white text-gray-400 hover:text-gray-900"
               }`}
               title="Grid View"
             >
-              <FiGrid className="text-sm stroke-[2]" />
+              <FiGrid className="text-sm stroke-[2.5]" />
             </button>
           </div>
         </div>
@@ -185,15 +185,15 @@ const MyFiles = ({ url, data, getdata, active }) => {
         {viewMode === "grid" ? (
           <div className="w-full flex-1 min-h-0 overflow-y-auto hide-scrollbar">
             {files.length === 0 ? (
-              <div className="w-full h-full bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col items-center justify-center py-16 text-center p-6">
+              <div className="w-full h-full bg-[#FAFAFA]/40 border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center py-16 text-center p-6">
                 <img
                   src="/empty-box.png"
                   className="w-20 h-20 mb-4 opacity-50 select-none pointer-events-none"
                   alt="Empty"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
-                <h2 className="text-xs font-bold text-gray-700">This folder is empty</h2>
-                <p className="text-gray-400 text-[11px] font-medium mt-1">
+                <h2 className="text-xs font-black text-gray-900 uppercase">This folder is empty</h2>
+                <p className="text-gray-550 text-[11px] font-bold mt-1">
                   Upload files or create directories to get started.
                 </p>
               </div>
@@ -220,27 +220,26 @@ const MyFiles = ({ url, data, getdata, active }) => {
         ) : (
           <div className="w-full flex-1 min-h-0 flex flex-col bg-transparent">
             {/* Table Header */}
-            <div className="flex items-center h-10 px-4 text-[10px] font-extrabold tracking-wider text-gray-400 select-none shrink-0 uppercase">
-              <div className="w-[34%] pl-2">Name</div>
-              <div className="w-[18%] text-center">Modified</div>
-              <div className="w-[16%] text-center">Owner</div>
-              <div className="w-[8%] text-center">Type</div>
-              <div className="w-[10%] text-center">Size</div>
-              <div className="w-[14%]"></div>
+            <div className="flex items-center h-10 px-4 text-[10.5px] font-black tracking-wider text-gray-900 select-none shrink-0 uppercase border-b-2 border-gray-900">
+              <div className="flex-1 md:w-[50%] pl-2">Name</div>
+              <div className="hidden md:block w-[18%] text-center">Modified</div>
+              <div className="hidden md:block w-[8%] text-center">Type</div>
+              <div className="w-20 md:w-[10%] text-center">Size</div>
+              <div className="w-16 md:w-[14%]"></div>
             </div>
 
             {/* Table Body */}
             <div className="flex-1 overflow-y-auto hide-scrollbar p-1">
               {files.length === 0 ? (
-                <div className="w-full h-full flex flex-col items-center justify-center py-16 text-center p-6">
+                <div className="w-full h-full flex flex-col items-center justify-center py-16 text-center p-6 bg-[#FAFAFA]/40 rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)]">
                   <img
                     src="/empty-box.png"
                     className="w-20 h-20 mb-4 opacity-50 select-none pointer-events-none"
                     alt="Empty"
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <h2 className="text-xs font-bold text-gray-700">This folder is empty</h2>
-                  <p className="text-gray-400 text-[11px] font-medium mt-1">
+                  <h2 className="text-xs font-black text-gray-900 uppercase">This folder is empty</h2>
+                  <p className="text-gray-550 text-[11px] font-bold mt-1">
                     Upload files or create directories to get started.
                   </p>
                 </div>
@@ -283,46 +282,34 @@ const MyFiles = ({ url, data, getdata, active }) => {
             className="w-full max-w-[360px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-5 animate-slide-up">
+            <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col gap-5 animate-slide-up">
               <div className="flex items-center justify-between">
                 <div className="flex gap-3 items-center">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-lg">
+                  <div className="w-9 h-9 rounded-xl bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-lg shadow-[2px_2px_0px_rgba(0,0,0,1)]">
                     📁
                   </div>
-                  <h1 className="text-sm font-bold text-gray-800">Create Folder</h1>
+                  <h1 className="text-sm font-black text-gray-900 uppercase">Create Folder</h1>
                 </div>
                 <button
                   type="button"
-                  className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-150 transition-colors"
+                  className="w-8 h-8 rounded-lg bg-gray-50 border-2 border-gray-900 flex items-center justify-center cursor-pointer hover:bg-gray-150 transition-colors"
                   onClick={() => {
                     setnewfolder(true);
                     setfoldername("");
                   }}
                 >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M18 6 6 18"></path>
-                    <path d="M6 6l12 12"></path>
-                  </svg>
+                  ✕
                 </button>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="folderinput" className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                <label htmlFor="folderinput" className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                   Folder Name
                 </label>
                 <input
                   type="text"
                   id="folderinput"
-                  className="w-full px-3.5 py-2.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                  className="w-full px-3.5 py-2.5 border-2 border-gray-900 bg-white rounded-xl outline-none text-xs font-bold text-gray-900 focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] transition-all"
                   placeholder="e.g., Marketing Assets"
                   value={foldername}
                   onChange={(e) => setfoldername(e.target.value)}
@@ -333,7 +320,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
               <div className="flex gap-3 justify-end mt-2">
                 <button
                   type="button"
-                  className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                  className="text-xs px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-900 rounded-xl cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                   onClick={() => {
                     setnewfolder(true);
                     setfoldername("");
@@ -343,7 +330,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
                 </button>
                 <button
                   type="submit"
-                  className="text-xs px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                  className="text-xs px-5 py-2 bg-[#CCFF00] hover:bg-[#b5e000] border-2 border-gray-900 transition-colors flex items-center justify-center text-gray-900 rounded-xl cursor-pointer font-black gap-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 >
                   Create
                 </button>
@@ -352,7 +339,6 @@ const MyFiles = ({ url, data, getdata, active }) => {
           </form>
         </div>
       )}
-
       {/* Rename Folder Modal */}
       {folderrename && (
         <div
@@ -363,47 +349,35 @@ const MyFiles = ({ url, data, getdata, active }) => {
           }}
         >
           <div
-            className="w-full max-w-[360px] bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-4 animate-slide-up"
+            className="w-full max-w-[360px] bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col gap-4 animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 text-base shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-gray-900 text-base shadow-[1px_1px_0px_rgba(0,0,0,1)]">
                   📁
                 </div>
-                <h1 className="font-bold text-sm text-gray-800">Rename Folder</h1>
+                <h1 className="font-black text-sm text-gray-900 uppercase">Rename Folder</h1>
               </div>
               <button
-                className="w-7 h-7 bg-gray-50 border border-gray-150 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 text-gray-400 transition-all"
+                className="w-7 h-7 bg-white border-2 border-gray-900 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 text-gray-900 font-bold shadow-[1px_1px_0px_rgba(0,0,0,1)]"
                 onClick={() => {
                   setfolderrename(false);
                   setnewfoldername(oldfoldername);
                 }}
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 6 6 18"></path>
-                  <path d="M6 6l12 12"></path>
-                </svg>
+                ✕
               </button>
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="text-[10px] font-semibold text-gray-450 flex items-center gap-1">
+              <div className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
                 <span>Original:</span>
-                <span className="font-bold text-gray-700 truncate">{oldfoldername}</span>
+                <span className="font-black text-gray-700 truncate">{oldfoldername}</span>
               </div>
               <input
                 type="text"
-                className="w-full px-3.5 py-2.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                className="w-full px-3.5 py-2.5 border-2 border-gray-900 rounded-xl outline-none text-xs font-bold text-gray-955 bg-white focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] transition-all"
                 value={newfoldername}
                 onChange={(e) => setnewfoldername(e.target.value)}
                 autoFocus
@@ -412,7 +386,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
 
             <div className="flex gap-3 justify-end mt-2">
               <button
-                className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                className="text-xs px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-900 rounded-xl cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => {
                   setfolderrename(false);
                   setnewfoldername(oldfoldername);
@@ -421,7 +395,7 @@ const MyFiles = ({ url, data, getdata, active }) => {
                 Cancel
               </button>
               <button
-                className="text-xs px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                className="text-xs px-5 py-2 bg-[#CCFF00] hover:bg-[#b5e000] border-2 border-gray-900 transition-colors flex items-center justify-center text-gray-900 rounded-xl cursor-pointer font-black gap-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={handlefolderrename}
               >
                 Rename

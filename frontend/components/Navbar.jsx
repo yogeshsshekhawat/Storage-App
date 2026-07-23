@@ -4,12 +4,13 @@ import {
   FiUser,
   FiSettings,
   FiLogOut,
-  FiPieChart
+  FiPieChart,
+  FiMenu
 } from "react-icons/fi";
 import Filecard from "./Filecard";
 import Foldercard from "./Foldercard";
 
-const Navbar = ({ data, getdata, url, setActive }) => {
+const Navbar = ({ data, getdata, url, setActive, setIsMobileMenuOpen }) => {
   const [profilemenu, setprofiloemenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -89,16 +90,25 @@ const Navbar = ({ data, getdata, url, setActive }) => {
 
   return (
     <>
-      <div className="w-full h-16  border-b border-[#EBEAEA] bg-white/70 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-20">
+      <div className="w-full h-16 border-b-2 border-gray-900 bg-white flex items-center justify-between px-3 md:px-6 shrink-0 relative z-20 gap-3">
+        {/* Mobile Sidebar Toggle Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen((prev) => !prev)}
+          className="md:hidden w-9 h-9 rounded-xl bg-white border-2 border-gray-900 flex items-center justify-center text-gray-900 shrink-0 cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          aria-label="Toggle Navigation Menu"
+        >
+          <FiMenu className="text-lg stroke-[2.5]" />
+        </button>
+
         {/* Responsive Search Input Container */}
-        <div ref={searchContainerRef} className="relative w-full max-w-2xl flex items-center">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 pointer-events-none">
-            <FiSearch className="text-sm" />
+        <div ref={searchContainerRef} className="relative flex-1 max-w-2xl flex items-center">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-900 pointer-events-none z-10 font-bold">
+            <FiSearch className="text-sm stroke-[3]" />
           </span>
           <input
             type="text"
             placeholder="Search files, folders..."
-            className="w-full h-9.5 pl-10 pr-4 py-2 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl outline-none bg-gray-50/50 hover:bg-gray-50 focus:bg-white text-xs font-semibold text-gray-700 transition-all focus:border-[#4A4D4A] focus:ring-[3.5px]"
+            className="w-full h-9.5 pl-10 pr-4 py-2 border-2 border-gray-900 rounded-xl outline-none bg-white text-xs font-bold text-gray-900 transition-all focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px]"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => {
@@ -108,7 +118,7 @@ const Navbar = ({ data, getdata, url, setActive }) => {
             }}
           />
           {showDropdown && (
-            <div className="absolute top-11 left-0 w-full max-h-[320px] overflow-y-auto bg-white border border-gray-200/80 rounded-2xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.12)] backdrop-blur-md z-50 flex flex-col hide-scrollbar p-1.5 gap-0.5">
+            <div className="absolute top-11 left-0 w-full max-h-[320px] overflow-y-auto bg-white border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] z-50 flex flex-col hide-scrollbar p-2 gap-0.5">
               {loading ? (
                 <div className="p-4 text-center text-gray-400 text-xs font-semibold">Searching...</div>
               ) : results.length > 0 ? (
@@ -148,9 +158,9 @@ const Navbar = ({ data, getdata, url, setActive }) => {
         </div>
 
         {/* User Profile Avatar Icon */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <div
-            className="profile w-8.5 h-8.5 rounded-full bg-gray-500 cursor-pointer flex items-center justify-center text-xs text-white overflow-hidden border border-gray-200 hover:border-gray-400 transition-all shadow-sm"
+            className="profile w-9 h-9 rounded-full bg-gray-500 cursor-pointer flex items-center justify-center text-xs text-white overflow-hidden border-2 border-gray-900 hover:border-gray-900 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all shadow-sm"
             onClick={() => setprofiloemenu(!profilemenu)}
           >
             <img
@@ -168,12 +178,12 @@ const Navbar = ({ data, getdata, url, setActive }) => {
               <div className="fixed inset-0 z-30" onClick={() => setprofiloemenu(false)}></div>
 
               <div
-                className="menu w-56 absolute top-11 right-0 bg-white border border-gray-200 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.15)] rounded-2xl p-1.5 flex flex-col gap-0.5 z-40 animate-slide-up"
+                className="menu w-56 absolute top-11 right-0 bg-white border-2 border-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,1)] rounded-2xl p-2 flex flex-col gap-1 z-40 animate-slide-up"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* User metadata header */}
-                <div className="userdata w-full p-3 flex items-center gap-3 bg-gray-50 border border-gray-150 rounded-xl shrink-0">
-                  <div className="profile w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-xs text-white overflow-hidden shrink-0">
+                <div className="userdata w-full p-3 flex items-center gap-3 bg-[#CCFF00]/10 border-2 border-gray-900 rounded-xl shrink-0">
+                  <div className="profile w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-xs text-white overflow-hidden shrink-0 border border-gray-900">
                     <img
                       src={data?.profilepic}
                       className="w-full h-full object-cover"
@@ -182,8 +192,8 @@ const Navbar = ({ data, getdata, url, setActive }) => {
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h1 className="text-[11px] font-extrabold text-gray-800 truncate leading-none mb-0.5">{data?.username}</h1>
-                    <h1 className="text-[9px] text-gray-400 font-semibold truncate leading-none">{data?.useremail}</h1>
+                    <h1 className="text-[11px] font-black text-gray-900 truncate leading-none mb-0.5">{data?.username}</h1>
+                    <h1 className="text-[9px] text-gray-500 font-bold truncate leading-none">{data?.useremail}</h1>
                   </div>
                 </div>
 
@@ -194,9 +204,9 @@ const Navbar = ({ data, getdata, url, setActive }) => {
                       if (setActive) setActive("Settings");
                       setprofiloemenu(false);
                     }}
-                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-black text-gray-800 hover:bg-gray-100 rounded-xl transition-all cursor-pointer"
                   >
-                    <FiUser className="text-gray-400 text-xs shrink-0" />
+                    <FiUser className="text-gray-900 text-xs shrink-0 stroke-[2.5]" />
                     My profile
                   </div>
                   <div
@@ -204,9 +214,9 @@ const Navbar = ({ data, getdata, url, setActive }) => {
                       if (setActive) setActive("Settings");
                       setprofiloemenu(false);
                     }}
-                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-black text-gray-800 hover:bg-gray-100 rounded-xl transition-all cursor-pointer"
                   >
-                    <FiSettings className="text-gray-400 text-xs shrink-0" />
+                    <FiSettings className="text-gray-900 text-xs shrink-0 stroke-[2.5]" />
                     Settings
                   </div>
                   <div
@@ -214,19 +224,19 @@ const Navbar = ({ data, getdata, url, setActive }) => {
                       if (setActive) setActive("Settings");
                       setprofiloemenu(false);
                     }}
-                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all cursor-pointer"
+                    className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-black text-gray-800 hover:bg-gray-100 rounded-xl transition-all cursor-pointer"
                   >
-                    <FiPieChart className="text-gray-400 text-xs shrink-0" />
+                    <FiPieChart className="text-gray-900 text-xs shrink-0 stroke-[2.5]" />
                     Storage plan
                   </div>
                 </div>
 
                 {/* Sign Out Action Button */}
                 <button
-                  className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-extrabold text-red-500 hover:bg-red-50 active:bg-red-100 rounded-xl transition-all cursor-pointer border-none bg-transparent"
+                  className="w-full px-3 py-2 flex items-center gap-2.5 text-[11px] font-black text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer border-none bg-transparent"
                   onClick={handlelogout}
                 >
-                  <FiLogOut className="text-red-400 text-xs shrink-0" />
+                  <FiLogOut className="text-red-500 text-xs shrink-0 stroke-[2.5]" />
                   Sign Out
                 </button>
               </div>
@@ -239,3 +249,4 @@ const Navbar = ({ data, getdata, url, setActive }) => {
 };
 
 export default Navbar;
+

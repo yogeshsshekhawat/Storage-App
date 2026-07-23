@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import fs from "node:fs";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl as getCloudFrontSignedUrl } from "@aws-sdk/cloudfront-signer";
@@ -43,22 +44,70 @@ export const getPresignedDownloadUrl = async (key, originalFilename, action) => 
     disposition = `inline; filename="${encodeURIComponent(originalFilename)}"`;
   }
 
-  const isCloudFrontConfigured =
-    process.env.CLOUDFRONT_URL &&
-    process.env.CLOUDFRONT_KEY_PAIR_ID &&
-    process.env.CLOUDFRONT_PRIVATE_KEY;
+  const cleanEnvVar = (val) => {
+    if (!val) return "";
+    let s = val.trim();
+    if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+      s = s.slice(1, -1);
+    }
+    return s.trim();
+  };
+
+  const cfUrl = cleanEnvVar(process.env.CLOUDFRONT_URL);
+  const cfKeyPairId = cleanEnvVar(process.env.CLOUDFRONT_KEY_PAIR_ID);
+  const cfPrivateKey = cleanEnvVar(process.env.CLOUDFRONT_PRIVATE_KEY);
+
+  const isValidCfKeyId = (id) => {
+    return /^[K][A-Z0-9]{11,14}$/.test(id);
+  };
+
+  const isCloudFrontConfigured = cfUrl && cfKeyPairId && cfPrivateKey && isValidCfKeyId(cfKeyPairId);
+
+  if (cfUrl && cfKeyPairId && cfPrivateKey && !isValidCfKeyId(cfKeyPairId)) {
+    console.warn(`WARNING: CloudFront Key Pair ID "${cfKeyPairId}" does not match the expected AWS 14-character format starting with 'K'. Falling back to secure S3 Presigned URL.`);
+  }
 
   if (isCloudFrontConfigured) {
     try {
-      // S3 expects overrides through query parameters, CloudFront can forward them to S3
-      const cloudFrontUrl = `${process.env.CLOUDFRONT_URL.replace(/\/$/, "")}/${key}?response-content-disposition=${encodeURIComponent(disposition)}`;
-      
-      return getCloudFrontSignedUrl({
-        url: cloudFrontUrl,
-        keyPairId: process.env.CLOUDFRONT_KEY_PAIR_ID,
-        privateKey: process.env.CLOUDFRONT_PRIVATE_KEY.replace(/\\n/g, "\n"), // Handle raw string and file-based newline configurations
-        dateLessThan: new Date(Date.now() + 3600 * 1000).toISOString(), // URL expires in 1 hour
+      let cfBase = cfUrl;
+      if (!cfBase.startsWith("http://") && !cfBase.startsWith("https://")) {
+        cfBase = `https://${cfBase}`;
+      }
+
+      // Base resource path to sign
+      const cloudFrontBaseUrl = `${cfBase.replace(/\/$/, "")}/${key}`;
+
+      // Wildcard custom policy allowing subsequent query parameters to be appended safely
+      const customPolicy = JSON.stringify({
+        Statement: [
+          {
+            Resource: `${cloudFrontBaseUrl}*`,
+            Condition: {
+              DateLessThan: {
+                "AWS:EpochTime": Math.floor((Date.now() + 3600 * 1000) / 1000), // Expires in 1 hour
+              },
+            },
+          },
+        ],
       });
+
+      const signedBase = getCloudFrontSignedUrl({
+        url: cloudFrontBaseUrl,
+        policy: customPolicy,
+        keyPairId: cfKeyPairId,
+        privateKey: cfPrivateKey.replace(/\\n/g, "\n"), // Handle raw string and file-based newline configurations
+      });
+
+      // Append custom query parameters at the end (allowed due to wildcard policy resource)
+      const signedUrlWithParams = `${signedBase}&response-content-disposition=${encodeURIComponent(disposition)}`;
+
+      try {
+        fs.writeFileSync("scratch/signed_url.txt", signedUrlWithParams);
+      } catch (e) {
+        console.error("Failed to write signed URL to file", e);
+      }
+
+      return signedUrlWithParams;
     } catch (err) {
       console.error("Error generating CloudFront signed URL, falling back to S3 presigned URL:", err);
     }

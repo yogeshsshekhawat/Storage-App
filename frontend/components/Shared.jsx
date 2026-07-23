@@ -34,31 +34,31 @@ const Shared = () => {
       {/* Files Section */}
       <div className="flex-1 min-h-0 flex flex-col gap-2.5">
         <div className="flex items-center justify-between shrink-0 pl-1">
-          <h2 className="text-[11px] text-gray-400 tracking-[1.5px] font-bold uppercase select-none">
+          <h2 className="text-[11px] text-gray-900 tracking-[1.5px] font-black uppercase select-none">
             Shared with me
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode("list")}
-              className={`w-8 h-8 rounded-lg border transition-all cursor-pointer flex items-center justify-center shadow-sm ${
+              className={`w-8 h-8 rounded-lg border-2 border-gray-900 transition-all cursor-pointer flex items-center justify-center ${
                 viewMode === "list"
-                  ? "bg-white text-[#4A4D4A] border-[#4A4D4A]/30 ring-2 ring-[#4A4D4A]/5"
-                  : "bg-white/70 border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  ? "bg-[#CCFF00] text-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]"
+                  : "bg-white text-gray-400 hover:text-gray-900"
               }`}
               title="List View"
             >
-              <FiList className="text-sm stroke-[2]" />
+              <FiList className="text-sm stroke-[2.5]" />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`w-8 h-8 rounded-lg border transition-all cursor-pointer flex items-center justify-center shadow-sm ${
+              className={`w-8 h-8 rounded-lg border-2 border-gray-900 transition-all cursor-pointer flex items-center justify-center ${
                 viewMode === "grid"
-                  ? "bg-white text-[#4A4D4A] border-[#4A4D4A]/30 ring-2 ring-[#4A4D4A]/5"
-                  : "bg-white/70 border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                  ? "bg-[#CCFF00] text-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]"
+                  : "bg-white text-gray-400 hover:text-gray-900"
               }`}
               title="Grid View"
             >
-              <FiGrid className="text-sm stroke-[2]" />
+              <FiGrid className="text-sm stroke-[2.5]" />
             </button>
           </div>
         </div>
@@ -66,16 +66,16 @@ const Shared = () => {
         {viewMode === "grid" ? (
           <div className="w-full flex-1 min-h-0 overflow-y-auto hide-scrollbar">
             {loading ? (
-              <div className="w-full h-full bg-white border border-gray-200 rounded-2xl shadow-sm flex items-center justify-center py-16 text-center text-xs text-gray-400 font-bold select-none">
+              <div className="w-full h-full bg-[#FAFAFA]/40 border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] flex items-center justify-center py-16 text-center text-xs text-gray-900 font-black select-none uppercase">
                 Loading files...
               </div>
             ) : files.length === 0 ? (
-              <div className="w-full h-full bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col items-center justify-center py-16 text-center p-6">
-                <div className="w-16 h-16 rounded-2xl bg-blue-50/75 border border-blue-100 flex items-center justify-center text-blue-500 text-2xl shadow-sm mb-4 select-none">
+              <div className="w-full h-full bg-[#FAFAFA]/40 border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center py-16 text-center p-6">
+                <div className="w-16 h-16 rounded-2xl bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-gray-900 text-2xl shadow-[2px_2px_0px_rgba(0,0,0,1)] mb-4 select-none">
                   🔗
                 </div>
-                <h2 className="text-xs font-bold text-gray-700 select-none">No shared content</h2>
-                <p className="text-gray-400 text-[11px] font-medium mt-1 select-none">
+                <h2 className="text-xs font-black text-gray-900 select-none uppercase">No shared content</h2>
+                <p className="text-gray-500 text-[11px] font-bold mt-1 select-none">
                   Files that other users share with you by email will appear here.
                 </p>
               </div>
@@ -93,6 +93,7 @@ const Shared = () => {
                     favorites={el.favorites}
                     active="Shared"
                     layout="grid"
+                    ownerName={el.ownerName}
                   />
                 ))}
               </div>
@@ -101,7 +102,7 @@ const Shared = () => {
         ) : (
           <div className="w-full flex-1 min-h-0 flex flex-col bg-transparent">
             {/* Table Header */}
-            <div className="flex items-center h-10 px-4 text-[10px] font-extrabold tracking-wider text-gray-400 select-none shrink-0 uppercase">
+            <div className="flex items-center h-10 px-4 text-[10.5px] font-black tracking-wider text-gray-900 select-none shrink-0 uppercase border-b-2 border-gray-900">
               <div className="w-[34%] pl-2">Name</div>
               <div className="w-[18%] text-center">Modified</div>
               <div className="w-[16%] text-center">Owner</div>
@@ -113,16 +114,16 @@ const Shared = () => {
             {/* Table Body */}
             <div className="flex-1 overflow-y-auto hide-scrollbar p-1">
               {loading ? (
-                <div className="w-full h-full flex items-center justify-center py-16 text-center text-xs text-gray-400 font-bold select-none">
+                <div className="w-full h-full bg-[#FAFAFA]/40 border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] flex items-center justify-center py-16 text-center text-xs text-gray-900 font-black select-none uppercase">
                   Loading files...
                 </div>
               ) : files.length === 0 ? (
-                <div className="w-full h-full flex flex-col items-center justify-center py-16 text-center p-6">
-                  <div className="w-16 h-16 rounded-2xl bg-blue-50/75 border border-blue-100 flex items-center justify-center text-blue-500 text-2xl shadow-sm mb-4 select-none">
+                <div className="w-full h-full flex flex-col items-center justify-center py-16 text-center p-6 bg-[#FAFAFA]/40 border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                  <div className="w-16 h-16 rounded-2xl bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-gray-900 text-2xl shadow-[2px_2px_0px_rgba(0,0,0,1)] mb-4 select-none">
                     🔗
                   </div>
-                  <h2 className="text-xs font-bold text-gray-700 select-none">No shared content</h2>
-                  <p className="text-gray-400 text-[11px] font-medium mt-1 select-none">
+                  <h2 className="text-xs font-black text-gray-900 select-none uppercase">No shared content</h2>
+                  <p className="text-gray-500 text-[11px] font-bold mt-1 select-none">
                     Files that other users share with you by email will appear here.
                   </p>
                 </div>
@@ -139,6 +140,7 @@ const Shared = () => {
                     favorites={el.favorites}
                     active="Shared"
                     layout="list"
+                    ownerName={el.ownerName}
                   />
                 ))
               )}

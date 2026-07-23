@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [passwordtype,setpasswordtype] = useState('password')
+  const [passwordtype, setpasswordtype] = useState('password')
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -96,13 +96,13 @@ export default function Login() {
     });
     const output = await response.json();
 
-    if(output == 'register'){
+    if (output == 'register') {
       navigate('/drive')
     }
-    
+
   }
 
-  async function checklogin(){
+  async function checklogin() {
     const res = await fetch(`${BASE_URL}/checklogin`, {
       credentials: "include",
     });
@@ -113,153 +113,98 @@ export default function Login() {
     }
   }
 
-  useEffect( () => {
+  useEffect(() => {
     checklogin()
   }, []);
   return (
     <>
-      {/* Add custom animations */}
       <style>{`
-        @keyframes orbFloat1 {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); }
-          33% { transform: translate(-50%, -50%) scale(1.08) translate(18px, -12px); }
-          66% { transform: translate(-50%, -50%) scale(0.95) translate(-12px, 16px); }
-        }
-        @keyframes orbFloat2 {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); }
-          40% { transform: translate(-50%, -50%) scale(1.12) translate(-20px, 10px); }
-          70% { transform: translate(-50%, -50%) scale(0.92) translate(14px, -18px); }
-        }
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
       `}</style>
 
-      <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAFAFA] relative overflow-hidden font-sans">
-        {/* Background animated orbs */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          {/* Orb 1 */}
-          <div
-            className="absolute w-75 h-75 sm:w-1-100 lg:w-125 lg:h-125 rounded-full"
-            style={{
-              top: "20%",
-              left: "15%",
-              background:
-                "radial-gradient(circle, rgba(2,132,199,0.18) 0%, rgba(124,58,237,0.12) 40%, transparent 70%)",
-              transform: "translate(-50%, -50%)",
-              filter: "blur(80px)",
-              animation: "orbFloat1 10s ease-in-out infinite",
-            }}
-          />
-          {/* Orb 2 */}
-          <div
-            className="absolute w-62.5 h-62.5 sm:w-87.5 sm:h-87.5 lg:w-100 lg:h-100 rounded-full"
-            style={{
-              top: "70%",
-              left: "80%",
-              background:
-                "radial-gradient(circle, rgba(22,163,74,0.15) 0%, rgba(8,145,178,0.10) 50%, transparent 70%)",
-              transform: "translate(-50%, -50%)",
-              filter: "blur(80px)",
-              animation: "orbFloat2 12s ease-in-out infinite",
-            }}
-          />
-          {/* Orb 3 */}
-          <div
-            className="absolute w-50 h-50 sm:w-62.5 sm:h-62.5 lg:w-75 lg:h-75 rounded-full"
-            style={{
-              top: "50%",
-              left: "50%",
-              background:
-                "radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)",
-              transform: "translate(-50%, -50%)",
-              filter: "blur(80px)",
-              animation: "orbFloat1 8s ease-in-out infinite reverse",
-            }}
-          />
-        </div>
+      <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAFAFA] relative overflow-hidden font-sans bg-[linear-gradient(to_right,#e8e8e8_1px,transparent_1px),linear-gradient(to_bottom,#e8e8e8_1px,transparent_1px)] bg-[size:32px_32px]">
 
         {/* Left Panel - Branding */}
-        <div className="flex-1 flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-16 lg:px-16 lg:py-20 relative z-10">
+        <div className="hidden lg:flex flex-1 flex-col justify-center lg:px-16 lg:py-20 relative z-10">
           <Link
             to="/"
-            className="flex items-center gap-2 text-lg sm:text-xl  tracking-tight text-[#2E302E] mb-8 sm:mb-10 lg:mb-12 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 text-xl font-black tracking-tight text-gray-900 mb-10 lg:mb-14 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl sm:text-3xl">☁️</span>
             CloudVault
           </Link>
 
-          <div className="max-w-120">
-            <h1 className="text-3xl sm:text-4xl lg:text-[56px]  leading-[1.1] tracking-[-1.8px] text-[#1A1C1A] mb-4 sm:mb-5">
-              Welcome back to{" "}
-              <span className="bg-linear-to-br from-[#0284C7] to-[#7C3AED] bg-clip-text text-transparent">
-                CloudVault
-              </span>
+          <div className="max-w-lg">
+            {/* Heading design matching landing page sections */}
+            <span className="text-[#868A8E] text-[11px] uppercase tracking-[2px] font-black block mb-3">
+              SIGN IN TO YOUR ACCOUNT
+            </span>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-[52px] font-black leading-[1.06] tracking-tight text-gray-800 mb-4 uppercase select-none">
+              Welcome Back<br />
+              <span className="text-gray-800">To CloudVault</span>
             </h1>
-            <p className="text-sm sm:text-base text-[#4A4D4A] leading-relaxed mb-8 sm:mb-10">
+
+            {/* Lime badge */}
+            <div className="inline-block bg-[#CCFF00] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1deg] text-[10px] font-black uppercase text-gray-800 px-4 py-1.5 rounded-full select-none mb-6 hover:rotate-0 transition-transform">
+              YOUR FILES ARE WAITING
+            </div>
+
+            <p className="text-sm text-gray-500 font-semibold leading-relaxed mb-10 max-w-md">
               Access your files from anywhere. Your data is encrypted end-to-end
               and always under your control.
             </p>
 
-            {/* Stats - Hidden on small screens */}
-            <div className="hidden md:grid grid-cols-3 gap-4 lg:gap-6 p-6 bg-white border-[1.5px] border-[#E0DFDF] rounded-2xl shadow-sm">
+            {/* Floating feature cards - desktop only */}
+            <div className="hidden lg:flex flex-col gap-4">
               {[
-                { value: "99.99%", label: "Uptime" },
-                { value: "2.4M+", label: "Active Users" },
-                { value: "AES-256", label: "Encryption" },
-              ].map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <div className="text-xl sm:text-2xl  tracking-tight text-[#1A1C1A] mb-1">
-                    {stat.value}
+                { ico: "🔐", label: "Bank-level encryption", color: "#CCFF00" },
+                { ico: "⚡", label: "Lightning-fast sync", color: "#1A6EEF" },
+                { ico: "🌍", label: "Access from anywhere", color: "#9D5CFF" },
+              ].map((feature, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-base border-2 border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] shrink-0"
+                    style={{ background: feature.color }}
+                  >
+                    {feature.ico}
                   </div>
-                  <div className="text-[11px] sm:text-xs text-[#8A8D8A] font-medium">
-                    {stat.label}
-                  </div>
+                  <span className="text-xs font-black text-gray-700 uppercase tracking-wider">
+                    {feature.label}
+                  </span>
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* Features */}
-            <div className="hidden lg:flex flex-col gap-3 mt-8">
-              {[
-                {
-                  ico: "🔐",
-                  text: "Bank-level security with zero-knowledge encryption",
-                },
-                {
-                  ico: "⚡",
-                  text: "Lightning-fast sync across all your devices",
-                },
-                {
-                  ico: "🌍",
-                  text: "Access your files from anywhere in the world",
-                },
-              ].map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-3 text-sm text-[#4A4D4A]"
-                >
-                  <span className="text-base">{feature.ico}</span>
-                  {feature.text}
-                </div>
-              ))}
+          {/* Floating decorative card - bottom left */}
+          <div className="hidden lg:block absolute left-[43%] bottom-[10%] animate-bounce" style={{ animationDuration: "6s" }}>
+            <div className="bg-white border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rounded-xl p-3 rotate-[4deg] max-w-[150px]">
+              <p className="text-[9px] font-extrabold text-gray-500 uppercase tracking-wider mb-1">Storage</p>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="text-lg font-black text-gray-900 leading-none">99.9</span>
+                <span className="text-[9px] font-bold text-gray-400 mb-0.5">% uptime</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right Panel - Login Form */}
-        <div className="flex-1 flex items-center justify-center px-6 py-10 sm:px-10 sm:py-16 lg:px-10 bg-white border-t lg:border-t-0 lg:border-l border-[#E0DFDF] relative z-10">
-          <div className="w-full max-w-110">
+        <div className="flex-1 flex items-center justify-center px-6 py-10 sm:px-10 sm:py-16 lg:px-10 relative z-10">
+          {/* Form card with neo-brutalist styling */}
+          <div className="w-full max-w-md bg-white border-2 border-gray-900 shadow-[6px_6px_0px_rgba(0,0,0,1)] rounded-2xl p-8 sm:p-10">
             {/* Form Header */}
-            <div className="text-center mb-8 sm:mb-9">
-              <h2 className="text-2xl sm:text-[28px]  tracking-[-0.8px] text-[#1A1C1A] mb-2">
-                Sign in to your account
+            <div className="text-center mb-8">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 mb-2 uppercase">
+                Sign In
               </h2>
-              <p className="text-sm text-[#4A4D4A]">
+              <p className="text-xs text-gray-500 font-semibold">
                 Don't have an account?{" "}
                 <Link
                   to="/register"
-                  className="text-[#4A4D4A] font-semibold hover:text-[#2E302E] transition-colors"
+                  className="text-gray-900 font-black hover:underline transition-colors"
                 >
                   Sign up free
                 </Link>
@@ -267,22 +212,24 @@ export default function Login() {
             </div>
 
             {/* Google Login Button */}
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                googleregister(credentialResponse);
-              }}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-              useOneTap
-            />
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  googleregister(credentialResponse);
+                }}
+                onError={() => {
+                  console.log("Login Failed");
+                }}
+                useOneTap
+              />
+            </div>
 
             <div className="flex items-center gap-4 my-7">
-              <div className="flex-1 h-px bg-[#E0DFDF]"></div>
-              <span className="text-xs font-semibold text-[#8A8D8A] uppercase tracking-wide">
+              <div className="flex-1 h-[2px] bg-gray-900/15"></div>
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                 or
               </span>
-              <div className="flex-1 h-px bg-[#E0DFDF]"></div>
+              <div className="flex-1 h-[2px] bg-gray-900/15"></div>
             </div>
 
             {/* Login Form */}
@@ -291,7 +238,7 @@ export default function Login() {
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="email"
-                  className="text-[13px] font-semibold text-[#1A1C1A] tracking-[0.2px]"
+                  className="text-[11px] font-black text-gray-900 uppercase tracking-wider"
                 >
                   Email Address
                 </label>
@@ -301,20 +248,20 @@ export default function Login() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 sm:py-3.25 border-[1.5px] ${errors.email ? "border-[#DC2626]" : "border-[#CECECE]"} rounded-[10px] text-sm text-[#1A1C1A] bg-white placeholder-[#8A8D8A] transition-all duration-200 outline-none focus:border-[#4A4D4A] focus:ring-[3px] focus:ring-[#4A4D4A]/10`}
+                  className={`w-full px-4 py-3 border-2 ${errors.email ? "border-red-500" : "border-gray-900"} rounded-xl text-sm font-bold text-gray-900 bg-white placeholder-gray-400 transition-all duration-200 outline-none focus:shadow-[3px_3px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px]`}
                   placeholder="you@company.com"
                 />
                 {errors.email && (
-                  <span className="text-xs text-[#DC2626]">{errors.email}</span>
+                  <span className="text-[10px] font-bold text-red-500">{errors.email}</span>
                 )}
               </div>
 
               {/* Password */}
-              <div className="flex flex-col gap-1.5 relative ">
+              <div className="flex flex-col gap-1.5 relative">
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="password"
-                    className="text-[13px] font-semibold text-[#1A1C1A] tracking-[0.2px]"
+                    className="text-[11px] font-black text-gray-900 uppercase tracking-wider"
                   >
                     Password
                   </label>
@@ -325,15 +272,15 @@ export default function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 sm:py-3.25 border-[1.5px] ${errors.password ? "border-[#DC2626]" : "border-[#CECECE]"} rounded-[10px] text-sm text-[#1A1C1A] bg-white placeholder-[#8A8D8A] transition-all duration-200 outline-none focus:border-[#4A4D4A] focus:ring-[3px] focus:ring-[#4A4D4A]/10`}
+                  className={`w-full px-4 py-3 border-2 ${errors.password ? "border-red-500" : "border-gray-900"} rounded-xl text-sm font-bold text-gray-900 bg-white placeholder-gray-400 transition-all duration-200 outline-none focus:shadow-[3px_3px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px]`}
                   placeholder="Enter your password"
                 />
                 {errors.password && (
-                  <span className="text-xs text-[#DC2626]">
+                  <span className="text-[10px] font-bold text-red-500">
                     {errors.password}
                   </span>
                 )}
-                <div className="w-5 h-5  absolute top-10 right-3 cursor-pointer" onClick={()=>{
+                <div className="w-5 h-5 absolute top-9 right-3 cursor-pointer" onClick={() => {
                   setpasswordtype(passwordtype === 'password' ? 'text' : 'password')
                 }}>
                   {passwordtype === 'password' && <img src="/hide.png"></img>}
@@ -341,24 +288,9 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Remember Me Checkbox
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleInputChange}
-                  className=" border-[1.5px] border-[#CECECE] rounded-[5px] cursor-pointer  accent-[#4A4D4A]"
-                />
-                <label htmlFor="rememberMe" className="text-[13px] text-[#4A4D4A] cursor-pointer select-none">
-                  Remember me for 30 days
-                </label>
-              </div> */}
-
               {/* Submit Error */}
               {errors.submit && (
-                <div className="px-3.5 py-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-[#DC2626]">
+                <div className="px-4 py-3 bg-red-50 border-2 border-red-400 rounded-xl text-xs font-bold text-red-600">
                   {errors.submit}
                 </div>
               )}
@@ -367,7 +299,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-5 py-3  sm:py-3.5 cursor-pointer mt-2 border-none rounded-[10px] bg-[#4A4D4A] text-white text-sm font-bold transition-all duration-200 hover:bg-[#2E302E] hover:-translate-y-0.5 hover:shadow-[0_4px_14px_rgba(74,77,74,0.35)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 shadow-[0_2px_8px_rgba(74,77,74,0.25)]"
+                className="w-full px-5 py-3.5 cursor-pointer mt-2 bg-gray-900 border-2 border-gray-900 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] text-white text-sm font-black rounded-xl uppercase tracking-wider transition-all duration-200 hover:bg-gray-800 hover:shadow-[2px_2px_0px_rgba(0,0,0,0.3)] hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -378,36 +310,51 @@ export default function Login() {
                     Signing in...
                   </span>
                 ) : (
-                  "Sign In"
+                  "Sign In →"
                 )}
               </button>
             </form>
 
-            {/* Additional Info */}
-            <div className="mt-7 pt-6 border-t border-[#E0DFDF] text-center">
-              <p className="text-xs text-[#8A8D8A] leading-relaxed">
-                Protected by industry-leading encryption.
-                <br className="hidden sm:block" />
-                Your data is always under your control.
-              </p>
-            </div>
-
             {/* Trust Badges */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 mt-5">
-              {[
-                { ico: "🔒", label: "256-bit SSL" },
-                { ico: "🛡️", label: "SOC 2 Certified" },
-                { ico: "✓", label: "GDPR Compliant" },
-              ].map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-1.5 text-xs text-[#8A8D8A] font-medium"
-                >
-                  <span className="text-sm">{item.ico}</span>
-                  {item.label}
-                </div>
-              ))}
+            <div className="mt-7 pt-6 border-t-2 border-gray-900/10">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {[
+                  { ico: "🔒", label: "256-bit SSL" },
+                  { ico: "🛡️", label: "SOC 2" },
+                  { ico: "✓", label: "GDPR" },
+                ].map((item, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 bg-white border-2 border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] rounded-full text-[8px] font-black text-gray-800 uppercase tracking-wider flex items-center gap-1"
+                  >
+                    <span className="text-xs">{item.ico}</span>
+                    {item.label}
+                  </span>
+                ))}
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* Floating decorative card - top right */}
+        <div className="hidden lg:block absolute right-[6%] top-[8%] z-20 animate-bounce" style={{ animationDuration: "5s" }}>
+          <div className="bg-[#CCFF00] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-6deg] w-11 h-11 rounded-xl flex items-center justify-center text-lg select-none">
+            ☁️
+          </div>
+        </div>
+        <div className="hidden lg:block absolute right-[5%] bottom-[10%] z-20 animate-bounce" style={{ animationDuration: "7s" }}>
+          <div className="bg-[#1A6EEF] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[5deg] w-11 h-11 rounded-xl flex items-center justify-center text-lg select-none text-white">
+            🔒
+          </div>
+        </div>
+        <div className="hidden lg:block absolute left-[56%] top-[8%] z-20 animate-bounce" style={{ animationDuration: "6.5s" }}>
+          <div className="bg-[#FF9F0A] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-6deg] w-11 h-11 rounded-xl flex items-center justify-center text-lg select-none text-white">
+            🔑
+          </div>
+        </div>
+        <div className="hidden lg:block absolute left-[56%] bottom-[8%] z-20 animate-bounce" style={{ animationDuration: "5.5s" }}>
+          <div className="bg-[#9D5CFF] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[10deg] w-11 h-11 rounded-xl flex items-center justify-center text-lg select-none text-white">
+            📁
           </div>
         </div>
       </div>

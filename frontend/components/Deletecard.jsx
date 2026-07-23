@@ -109,14 +109,14 @@ const Deletecard = ({ el, getdata, active }) => {
         type: value ? value : "null",
       },
     });
-    setrestoremenu(false)
+    setrestoremenu(false);
     getdata(active);
   }
   return (
-    <div className="w-full h-12.5 flex items-center hover:bg-gray-50/60 transition-colors border-b border-gray-100 last:border-b-0">
+    <div className="w-full h-13 flex items-center hover:bg-gray-50 bg-white transition-colors border-b-2 border-gray-900 last:border-b-0 select-none">
       {/* File Name */}
-      <div className="w-[32%] pl-6 flex items-center gap-3 text-xs font-semibold text-gray-700 truncate">
-        <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-150 flex-shrink-0 text-base shadow-sm">
+      <div className="w-[32%] pl-6 flex items-center gap-3 text-xs font-black text-gray-900 truncate uppercase">
+        <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-white border-2 border-gray-900 flex-shrink-0 text-base shadow-[1px_1px_0px_rgba(0,0,0,1)] [&>img]:w-full [&>img]:h-full [&>img]:object-contain">
           {fileIcons[el.ext] || "📁"}
         </div>
         <span className="truncate" title={el.name}>
@@ -125,7 +125,7 @@ const Deletecard = ({ el, getdata, active }) => {
       </div>
 
       {/* Original Location */}
-      <div className="w-[25%] flex items-center justify-center text-[11px] font-semibold text-gray-400 capitalize truncate px-2">
+      <div className="w-[25%] flex items-center justify-center text-[10px] font-black text-gray-550 capitalize truncate px-2">
         <span className="truncate">
           📁 &nbsp;/&nbsp;
           {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
@@ -133,12 +133,12 @@ const Deletecard = ({ el, getdata, active }) => {
       </div>
 
       {/* Deleted Time */}
-      <div className="w-[18%] flex items-center justify-center text-xs text-gray-500 font-medium">
+      <div className="w-[18%] flex items-center justify-center text-xs text-gray-900 font-bold">
         {timeAgo(el.updatedAt)}
       </div>
 
       {/* File Size */}
-      <div className="w-[12%] flex items-center justify-center text-xs text-gray-500 font-medium">
+      <div className="w-[12%] flex items-center justify-center text-xs text-gray-900 font-bold">
         {formatSize(el.size)}
       </div>
 
@@ -146,16 +146,15 @@ const Deletecard = ({ el, getdata, active }) => {
       <div className="w-[13%] flex items-center justify-end pr-6 gap-3">
         {/* Restore Action */}
         <button
-          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-blue-50 border border-blue-100 hover:bg-blue-100 hover:text-blue-700 text-blue-600 transition-colors shadow-sm"
+          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-white border-2 border-gray-900 hover:bg-gray-50 text-gray-900 transition-colors shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px]"
           onClick={() => setrestoremenu(true)}
           title="Restore File"
         >
           <svg
-            className="w-4 h-4"
+            className="w-4 h-4 stroke-[2.5]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            strokeWidth="2.2"
           >
             <path
               strokeLinecap="round"
@@ -167,7 +166,7 @@ const Deletecard = ({ el, getdata, active }) => {
 
         {/* Permanent Delete Action */}
         <button
-          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-red-50 border border-red-100 hover:bg-red-100 hover:text-red-700 text-red-500 transition-colors shadow-sm"
+          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center bg-red-100 border-2 border-red-500 text-red-700 hover:bg-red-200 transition-colors shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1.5px] hover:translate-y-[1.5px]"
           onClick={() => setdeletemenu(true)}
           title="Delete Forever"
         >
@@ -177,7 +176,7 @@ const Deletecard = ({ el, getdata, active }) => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2.2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
@@ -194,57 +193,45 @@ const Deletecard = ({ el, getdata, active }) => {
           onClick={() => setdeletemenu(false)}
         >
           <div
-            className="w-full max-w-[360px] bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-4 animate-slide-up"
+            className="w-full max-w-[360px] bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col gap-4 animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-base shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-red-100 border-2 border-gray-900 flex items-center justify-center text-red-650 text-base shadow-[1px_1px_0px_rgba(0,0,0,1)] font-black">
                   ⚠️
                 </div>
-                <h1 className="font-bold text-sm text-gray-800">Delete Forever?</h1>
+                <h1 className="font-black text-sm text-gray-900 uppercase">Delete Forever?</h1>
               </div>
               <button
-                className="w-7 h-7 bg-gray-50 border border-gray-150 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 text-gray-400 transition-all"
+                className="w-7 h-7 bg-white border-2 border-gray-900 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 text-gray-900 font-bold shadow-[1px_1px_0px_rgba(0,0,0,1)]"
                 onClick={() => setdeletemenu(false)}
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 6 6 18"></path>
-                  <path d="M6 6l12 12"></path>
-                </svg>
+                ✕
               </button>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+            <div className="flex flex-col gap-1.5">
+              <p className="text-xs text-gray-500 font-bold leading-relaxed">
                 Are you sure you want to permanently delete this file?
               </p>
-              <div className="bg-gray-50 border border-gray-150 p-2.5 rounded-lg text-xs font-bold text-gray-700 truncate max-w-full">
+              <div className="bg-[#FAFAFA] border-2 border-gray-900 p-2.5 rounded-lg text-xs font-black text-gray-950 truncate max-w-full">
                 {el.name}
               </div>
-              <p className="text-[11px] font-extrabold text-red-500 tracking-wide uppercase mt-1">
+              <p className="text-[11px] font-extrabold text-red-600 tracking-wide uppercase mt-1">
                 This action is destructive and cannot be undone!
               </p>
             </div>
 
             <div className="flex gap-3 justify-end mt-2">
               <button
-                className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                className="text-xs px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-900 rounded-xl cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => setdeletemenu(false)}
               >
                 Cancel
               </button>
               <button
-                className="text-xs px-5 py-2 bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                className="text-xs px-5 py-2 bg-red-100 hover:bg-red-200 border-2 border-red-500 text-red-700 transition-colors flex items-center justify-center rounded-xl cursor-pointer font-extrabold gap-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => handledelete(el._id, el.name, "permanentdelete")}
               >
                 Delete
@@ -261,46 +248,34 @@ const Deletecard = ({ el, getdata, active }) => {
           onClick={() => setrestoremenu(false)}
         >
           <div
-            className="w-full max-w-[360px] bg-white border border-gray-250/80 rounded-2xl p-6 shadow-[0_15px_45px_-15px_rgba(0,0,0,0.2)] flex flex-col gap-4 animate-slide-up"
+            className="w-full max-w-[360px] bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col gap-4 animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 text-base shadow-sm">
+                <div className="w-8 h-8 rounded-lg bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-gray-900 text-base shadow-[1px_1px_0px_rgba(0,0,0,1)]">
                   🔄
                 </div>
-                <h1 className="font-bold text-sm text-gray-800">Restore File?</h1>
+                <h1 className="font-black text-sm text-gray-900 uppercase">Restore File?</h1>
               </div>
               <button
-                className="w-7 h-7 bg-gray-50 border border-gray-150 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-100 text-gray-400 transition-all"
+                className="w-7 h-7 bg-white border-2 border-gray-900 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 text-gray-900 font-bold shadow-[1px_1px_0px_rgba(0,0,0,1)]"
                 onClick={() => setrestoremenu(false)}
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 6 6 18"></path>
-                  <path d="M6 6l12 12"></path>
-                </svg>
+                ✕
               </button>
             </div>
 
             <div className="flex flex-col gap-2">
-              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+              <p className="text-xs text-gray-500 font-bold leading-relaxed">
                 Restore this file back to its original directory path?
               </p>
-              <div className="bg-gray-50 border border-gray-150 p-2.5 rounded-lg text-xs font-bold text-gray-700 truncate max-w-full">
+              <div className="bg-[#FAFAFA] border-2 border-gray-900 p-2.5 rounded-lg text-xs font-black text-gray-950 truncate max-w-full">
                 {el.name}
               </div>
-              <div className="text-[11px] font-semibold text-gray-450 flex items-center gap-1">
+              <div className="text-[11px] font-bold text-gray-500 flex items-center gap-1">
                 <span>Location:</span>
-                <span className="font-extrabold text-gray-700 capitalize">
+                <span className="font-black text-gray-900 uppercase">
                   📁 / {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
                 </span>
               </div>
@@ -308,13 +283,13 @@ const Deletecard = ({ el, getdata, active }) => {
 
             <div className="flex gap-3 justify-end mt-2">
               <button
-                className="text-xs px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-600 rounded-xl cursor-pointer"
+                className="text-xs px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 transition-colors font-bold text-gray-900 rounded-xl cursor-pointer shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => setrestoremenu(false)}
               >
                 Cancel
               </button>
               <button
-                className="text-xs px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] transition-colors flex items-center justify-center text-white rounded-xl cursor-pointer font-bold gap-2 shadow-sm"
+                className="text-xs px-5 py-2 bg-[#CCFF00] hover:bg-[#b5e000] border-2 border-gray-900 transition-colors flex items-center justify-center text-gray-900 rounded-xl cursor-pointer font-black gap-2 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                 onClick={() => handlerestore(el._id, "restore")}
               >
                 Restore

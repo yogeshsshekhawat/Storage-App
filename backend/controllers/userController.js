@@ -14,7 +14,7 @@ import { registerSchema } from "../validator/Zod_Validator.js";
 import { setCachedSession, deleteCachedSession, getCachedSession } from "../config/redisService.js";
 
 
-export const userSession =  async (req, res) => {
+export const userSession = async (req, res) => {
   const { sid } = req.signedCookies;
   if (!sid) {
     const newsession = await Session.create({});
@@ -54,12 +54,12 @@ export const userRegister = async (req, res) => {
   // const { name } = req.body;
   // const { email } = req.body;
   // const { password } = req.body;
-  const {success,data,error} = registerSchema.safeParse(req.body)
+  const { success, data, error } = registerSchema.safeParse(req.body)
 
-  if(!success){
+  if (!success) {
     res.status(400).json({ error: "invalid credentials" });
   }
-  const {name ,email, password } = data;
+  const { name, email, password } = data;
   const { sid } = req.signedCookies;
   const usersession = await getCachedSession(sid);
 
@@ -69,13 +69,20 @@ export const userRegister = async (req, res) => {
 
   const a = await user.insertOne({ name, email, password });
   const b = await directory.insertOne({ name: "root", userid: a.id });
-  const session = await Session.findByIdAndUpdate(
-    sid,
-    { userid: a._id },
-    { new: true },
-  );
+  
+  let session;
+  if (sid) {
+    session = await Session.findByIdAndUpdate(
+      sid,
+      { userid: a._id },
+      { new: true },
+    );
+  }
+  if (!session) {
+    session = await Session.create({ userid: a._id });
+  }
   if (session) {
-    await setCachedSession(sid, session);
+    await setCachedSession(session._id, session);
   }
   const otp = Math.floor(100000 + Math.random() * 900000);
 
@@ -93,7 +100,7 @@ export const userRegister = async (req, res) => {
   res.json("registerd");
 }
 
-export const userLogin  =  async (req, res) => {
+export const userLogin = async (req, res) => {
   const { email } = req.body;
   const { password } = req.body;
   const { sid } = req.signedCookies;
@@ -101,9 +108,15 @@ export const userLogin  =  async (req, res) => {
   if (a) {
     const pass = await bcrypt.compare(password, a.password);
     if (pass) {
-      const session = await Session.findByIdAndUpdate(sid, { userid: a._id }, { new: true });
+      let session;
+      if (sid) {
+        session = await Session.findByIdAndUpdate(sid, { userid: a._id }, { new: true });
+      }
+      if (!session) {
+        session = await Session.create({ userid: a._id });
+      }
       if (session) {
-        await setCachedSession(sid, session);
+        await setCachedSession(session._id, session);
       }
       res.cookie("sid", session._id, {
         signed: true,
@@ -122,7 +135,7 @@ export const userLogin  =  async (req, res) => {
   }
 }
 
-export const userLogout =  async (req, res) => {
+export const userLogout = async (req, res) => {
   const { sid } = req.signedCookies;
   await Session.findByIdAndDelete(sid);
   await deleteCachedSession(sid);
@@ -140,7 +153,13 @@ export const userProfile = async (req, res) => {
 
 export const userVerifyemail = async (req, res) => {
   const { sid } = req.signedCookies;
-  const session = await Session.findById(sid);
+  let session;
+  if (sid) {
+    session = await getCachedSession(sid);
+  }
+  if (!session) {
+    return res.status(401).json("Unauthorized: Session not found");
+  }
   const userid = session.userid;
   const { otp: inputopt } = req.body;
   const otp = await Otp.findOne({ userid });
@@ -164,7 +183,7 @@ export const userVerifyemail = async (req, res) => {
   }
 }
 
-export const userGoogleregister  = async (req, res) => {
+export const userGoogleregister = async (req, res) => {
   const { credential } = req.body;
   const userdata = await verifyIdToken(credential);
   const { email, name, picture } = userdata;
@@ -180,19 +199,19 @@ export const userGoogleregister  = async (req, res) => {
     }
     await setCachedSession(session._id, session);
     res.cookie("sid", session._id, {
-        signed: true,
-        sameSite: "none",
-        secure: true,
-        httpOnly: true,
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      signed: true,
+      sameSite: "none",
+      secure: true,
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
 
     res.json("register");
   } else {
     const newuser = await user.create({
       name,
       email,
-      profilepic:picture,
+      profilepic: picture,
       isVerified: true,
     });
     const b = await directory.insertOne({ name: "root", userid: newuser.id });
@@ -222,23 +241,23 @@ export const userGoogleregister  = async (req, res) => {
 export const userUpdateProfile = async (req, res) => {
   const { name } = req.body;
   const { sid } = req.signedCookies;
-  
+
   if (!sid) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  
+
   try {
     const session = await getCachedSession(sid);
     if (!session || !session.userid) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     const updatedUser = await user.findByIdAndUpdate(
       session.userid,
       { $set: { name } },
       { new: true }
     );
-    
+
     res.json({ message: "Profile updated successfully", user: { name: updatedUser.name } });
   } catch (err) {
     console.error("Profile update error:", err);
@@ -311,7 +330,7 @@ export const userDeleteAccount = async (req, res) => {
     // 3. Delete files and directories records from MongoDB
     await file.deleteMany({ userid });
     await directory.deleteMany({ userid });
-    
+
     // 4. Delete the user itself
     await user.findByIdAndDelete(userid);
 
@@ -330,22 +349,22 @@ export const userDeleteAccount = async (req, res) => {
 export const userChangePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const { sid } = req.signedCookies;
-  
+
   if (!sid) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  
+
   try {
     const session = await getCachedSession(sid);
     if (!session || !session.userid) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-    
+
     const dbUser = await user.findById(session.userid);
     if (!dbUser) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Check current password (if user has set one)
     if (dbUser.password) {
       const isMatch = await bcrypt.compare(currentPassword, dbUser.password);
@@ -353,11 +372,11 @@ export const userChangePassword = async (req, res) => {
         return res.status(400).json({ error: "Incorrect current password" });
       }
     }
-    
+
     // Update new password (mongoose pre-save hook will handle hashing it)
     dbUser.password = newPassword;
     await dbUser.save();
-    
+
     res.json({ message: "Password updated successfully" });
   } catch (err) {
     console.error("Password update error:", err);

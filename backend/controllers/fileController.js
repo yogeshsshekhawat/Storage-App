@@ -33,14 +33,15 @@ export const getfile = async (req, res) => {
       return res.status(400).json({ message: "file not founded" });
     }
 
-    const hasAccess = files.userid.toString() === id.toString() || 
-                      (files.sharedWith && files.sharedWith.some(s => s.email.toLowerCase() === userEmail));
+    const hasAccess = files.userid.toString() === id.toString() ||
+      (files.sharedWith && files.sharedWith.some(s => s.email.toLowerCase() === userEmail));
 
     if (hasAccess) {
       files.lastAccessed = new Date();
       await files.save();
-      
+
       try {
+
         const s3Url = await getPresignedDownloadUrl(filename, name, action);
         res.redirect(s3Url);
       } catch (err) {
@@ -280,7 +281,7 @@ export const getShareInfo = async (req, res) => {
   try {
     const session = req.session;
     if (!session) return res.status(401).json("Unauthorized");
-    
+
     const fileData = await file.findById(id);
     if (!fileData) return res.status(404).json("File not found");
 
@@ -359,10 +360,10 @@ export const removeShareEmail = async (req, res) => {
     }
 
     const targetEmail = email.trim().toLowerCase();
-    
+
     // Safety guard
     fileData.sharedWith = fileData.sharedWith || [];
-    
+
     fileData.sharedWith = fileData.sharedWith.filter(s => s.email.toLowerCase() !== targetEmail);
 
     await fileData.save();
@@ -383,9 +384,17 @@ export const getSharedFiles = async (req, res) => {
     const sharedFiles = await file.find({
       "sharedWith.email": currentUser.email.toLowerCase(),
       isDeleted: { $ne: true }
+    }).populate({ path: "userid", model: "User", select: "name" });
+
+    const filesWithOwner = sharedFiles.map(f => {
+      const obj = f.toObject();
+      return {
+        ...obj,
+        ownerName: obj.userid ? obj.userid.name : "Unknown Owner"
+      };
     });
 
-    res.json(sharedFiles);
+    res.json(filesWithOwner);
   } catch (err) {
     console.error("getSharedFiles error:", err);
     res.status(500).json("Server error");

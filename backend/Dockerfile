@@ -13,9 +13,6 @@ RUN npm ci --only=production
 # Copy all backend source code (filtered by .dockerignore)
 COPY . .
 
-# Expose the port the server listens on (default is 3000 in app.js)
-EXPOSE 3000
-
 # Set Node environment to production
 ENV NODE_ENV=production
 

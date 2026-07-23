@@ -93,18 +93,23 @@ const Dashfcard = ({
     window.location.href = `${url}file/${id}${ext}?name=${name}`;
   }
   return (
-    <div className="w-full h-12  border-b border-[#b1b1b1]  select-none hover:bg-[#EBEAEA]" onDoubleClick={() => {
-            handleopen(name);
-          }}>
-      <div className="  w-full h-full flex items-center p-2  gap-2 ">
-        <div className="w-7 h-7  flex items-center  justify-center rounded">
-          {fileIcons[ext]}
+    <div
+      className="w-full h-12 border-b-2 border-gray-900 select-none hover:bg-gray-50 transition-colors cursor-pointer"
+      onDoubleClick={() => {
+        handleopen(name);
+      }}
+    >
+      <div className="w-full h-full flex items-center p-2 gap-3 justify-between">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 text-lg [&>img]:w-full [&>img]:h-full [&>img]:object-contain">
+            {fileIcons[ext] || "📁"}
+          </div>
+          <div className="text-xs font-black text-gray-900 truncate uppercase" title={name}>
+            {name}
+          </div>
         </div>
-        <div className="w-[9vw]  h-5 text-[12px] text-ellipsis overflow-hidden">
-          {name}
-        </div>
-          
-        <h1 className="text-[11px] ml-9 text-[#767575]">{timeAgo(modifed)}</h1>
+
+        <h1 className="text-[10px] text-gray-500 font-bold shrink-0">{timeAgo(modifed)}</h1>
       </div>
     </div>
   );

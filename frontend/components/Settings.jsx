@@ -150,10 +150,10 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
 
         {/* Header */}
         <div className="mb-1 shrink-0">
-          <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
+          <h1 className="text-2xl font-black text-gray-900 uppercase tracking-tight">
             Settings
           </h1>
-          <p className="text-xs text-gray-500 mt-1 font-semibold">
+          <p className="text-xs text-gray-500 mt-1 font-bold">
             Manage your account preferences, profile details, and storage security.
           </p>
         </div>
@@ -162,18 +162,18 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 items-stretch">
           {/* Profile Avatar Card (30%) */}
           <div className="lg:col-span-3 flex">
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col items-center justify-center text-center w-full">
+            <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[3px_3px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center text-center w-full">
               <div className="relative">
                 <img
                   src={data?.profilepic || "https://img.magnific.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740&q=80"}
-                  className="w-20 h-20 rounded-full border-2 border-white shadow-md bg-gray-50 object-cover"
+                  className="w-20 h-20 rounded-full border-2 border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] bg-gray-50 object-cover"
                   alt="Profile"
                   onError={(e) => { e.target.src = "https://www.gravatar.com/avatar/?d=mp"; }}
                 />
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></span>
               </div>
-              <h2 className="mt-3 text-base font-extrabold text-gray-800 leading-none">{data?.username || "User"}</h2>
-              <p className="text-xs text-gray-500 font-semibold mt-1">
+              <h2 className="mt-3 text-base font-black text-gray-900 uppercase leading-none">{data?.username || "User"}</h2>
+              <p className="text-xs text-gray-500 font-bold mt-1.5 uppercase">
                 {data?.useremail || "user@example.com"}
               </p>
             </div>
@@ -181,45 +181,45 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
 
           {/* Storage Usage Card (70%) */}
           <div className="lg:col-span-7 flex">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm w-full flex flex-col justify-between gap-5">
+            <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[3px_3px_0px_rgba(0,0,0,1)] w-full flex flex-col justify-between gap-5">
               <div>
-                <h2 className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-3">
+                <h2 className="text-[10px] font-black text-gray-900 uppercase tracking-wider mb-3">
                   Storage Usage
                 </h2>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-3.5 bg-gray-100 border-2 border-gray-900 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300"
+                    className="h-full bg-[#2B7FFF] rounded-full transition-all duration-300"
                     style={{ width: `${storageper}%` }}
                   />
                 </div>
-                <div className="flex justify-between mt-2.5 text-xs text-gray-500 font-semibold leading-none">
+                <div className="flex justify-between mt-2.5 text-xs text-gray-900 font-black uppercase leading-none">
                   <span>{formatBytes(totalSize)} used</span>
-                  <span className="text-gray-800 font-extrabold">{formattedLimit} Total</span>
+                  <span>{formattedLimit} Total</span>
                 </div>
 
                 {/* Billing and Subscription Details Grid */}
-                <div className="mt-5 pt-4 border-t border-gray-100 flex flex-col gap-3">
-                  <h3 className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                <div className="mt-5 pt-4 border-t-2 border-gray-900 flex flex-col gap-3">
+                  <h3 className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                     Subscription Details
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-650">
+                  <div className="grid grid-cols-2 gap-4 text-xs font-bold text-gray-900">
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-gray-400 font-extrabold uppercase">Plan Tier</span>
-                      <span className="text-gray-700 font-bold">{currentPlan === "Basic" ? "Basic (Free Tier)" : `${currentPlan} Plan`}</span>
+                      <span className="text-[9px] text-gray-500 font-black uppercase">Plan Tier</span>
+                      <span className="text-gray-900 font-black uppercase">{currentPlan === "Basic" ? "Basic (Free Tier)" : `${currentPlan} Plan`}</span>
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-gray-400 font-extrabold uppercase">Billing Cycle</span>
-                      <span className="text-gray-700 font-bold">{currentPlan === "Basic" ? "Free Forever" : "Monthly"}</span>
+                      <span className="text-[9px] text-gray-500 font-black uppercase">Billing Cycle</span>
+                      <span className="text-gray-900 font-black uppercase">{currentPlan === "Basic" ? "Free Forever" : "Monthly"}</span>
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-gray-400 font-extrabold uppercase">Purchased Date</span>
-                      <span className="text-gray-700 font-bold">
+                      <span className="text-[9px] text-gray-500 font-black uppercase">Purchased Date</span>
+                      <span className="text-gray-900 font-black uppercase">
                         {data?.createdAt ? new Date(data.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : "N/A"}
                       </span>
                     </div>
                     <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] text-gray-400 font-extrabold uppercase">Next Renewal</span>
-                      <span className="text-gray-700 font-bold">
+                      <span className="text-[9px] text-gray-500 font-black uppercase">Next Renewal</span>
+                      <span className="text-gray-900 font-black uppercase">
                         {currentPlan === "Basic" ? "N/A" : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </span>
                     </div>
@@ -228,7 +228,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
               </div>
               <button
                 onClick={() => setShowUpgradeModal(true)}
-                className="w-full mt-4 h-9.5 rounded-xl bg-[#4A4D4A] hover:bg-[#2E302E] text-white hover:shadow transition font-bold text-xs shadow-sm cursor-pointer border-none outline-none"
+                className="w-full mt-4 h-9.5 rounded-xl bg-[#CCFF00] hover:bg-[#b5e000] border-2 border-gray-900 text-gray-900 font-black text-xs shadow-[2.5px_2.5px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2.5px] hover:translate-y-[2.5px] transition-all cursor-pointer"
               >
                 ✨ Upgrade to Pro
               </button>
@@ -239,40 +239,40 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
         {/* ROW 2: Profile Info (Left) & Security + Delete Account (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* Profile Information */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+          <div className="bg-white border-2 border-gray-900 rounded-2xl p-5 shadow-[3px_3px_0px_rgba(0,0,0,1)] flex flex-col gap-4">
             <div>
-              <h2 className="text-sm font-extrabold text-gray-800 mb-3">
+              <h2 className="text-sm font-black text-gray-900 uppercase mb-3">
                 Profile Information
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                  <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                     Full Name
                   </label>
                   <input
-                    className="w-full h-9.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl px-3 outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                    className="w-full h-9.5 border-2 border-gray-900 bg-white rounded-xl px-3 outline-none text-xs font-bold text-gray-900 focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] transition-all"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                  <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                     Email Address
                   </label>
                   <input
-                    className="w-full h-9.5 border border-gray-200 rounded-xl px-3 outline-none text-xs font-semibold text-gray-400 bg-gray-50/50 cursor-not-allowed select-none"
+                    className="w-full h-9.5 border-2 border-gray-900 bg-gray-100 rounded-xl px-3 outline-none text-xs font-bold text-gray-400 cursor-not-allowed select-none"
                     value={email}
                     disabled
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-2 mt-3 pb-3.5 border-b border-gray-100">
-                {message && <p className="text-xs text-green-600 font-bold">{message}</p>}
-                {error && <p className="text-xs text-red-650 font-bold">{error}</p>}
+              <div className="flex flex-col gap-2 mt-3 pb-3.5 border-b-2 border-gray-900">
+                {message && <p className="text-xs text-green-600 font-black">{message}</p>}
+                {error && <p className="text-xs text-red-650 font-black">{error}</p>}
                 <button
                   onClick={handleSaveProfile}
                   disabled={isSaving}
-                  className="px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] disabled:bg-[#4A4D4A]/50 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-[0.98] cursor-pointer self-start"
+                  className="px-5 py-2 bg-[#CCFF00] hover:bg-[#b5e000] disabled:opacity-50 border-2 border-gray-900 text-gray-900 rounded-xl text-xs font-black transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer self-start"
                 >
                   {isSaving ? "Saving..." : "Save Changes"}
                 </button>
@@ -280,10 +280,10 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
             </div>            {/* Change Password Trigger */}
             <div className="flex justify-between items-center pt-2">
               <div>
-                <h3 className="text-xs font-bold text-gray-800">
+                <h3 className="text-xs font-black text-gray-900 uppercase">
                   Change Password
                 </h3>
-                <p className="text-[11px] text-gray-400 font-semibold mt-0.5">
+                <p className="text-[11px] text-gray-500 font-bold mt-0.5">
                   Update your account login security credentials.
                 </p>
               </div>
@@ -293,7 +293,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
                   setPasswordMessage("");
                   setPasswordError("");
                 }}
-                className="px-4 py-2 border border-gray-250 bg-white hover:bg-gray-50 rounded-xl text-xs font-bold text-gray-700 transition shadow-sm cursor-pointer"
+                className="px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 rounded-xl text-xs font-black text-gray-900 transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer"
               >
                 Change
               </button>
@@ -302,26 +302,26 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
 
           {/* Right Column: Danger Zone */}
           <div className="flex flex-col gap-4 h-full">
-            <div className="bg-red-50/40 border border-red-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between h-full">
+            <div className="bg-red-100/10 border-2 border-gray-900 rounded-2xl p-5 shadow-[3px_3px_0px_rgba(0,0,0,1)] flex flex-col justify-between h-full">
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">🚨</span>
-                  <h2 className="text-sm font-extrabold text-red-700">
+                  <h2 className="text-sm font-black text-red-750 uppercase">
                     Danger Zone
                   </h2>
                 </div>
 
-                <h3 className="text-xs font-extrabold text-red-800 mb-1">
+                <h3 className="text-xs font-black text-red-800 uppercase mb-1">
                   Delete Account Permanently
                 </h3>
-                <p className="text-[11.5px] text-red-650 font-semibold leading-relaxed">
+                <p className="text-[11.5px] text-red-700 font-bold leading-relaxed">
                   Permanently delete your account, cancel premium subscriptions, and purge all your stored database files. This action is irreversible.
                 </p>
               </div>
 
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="w-full mt-4 py-2 bg-red-600 hover:bg-red-750 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-[0.98] cursor-pointer text-center border-none outline-none"
+                className="w-full mt-4 py-2.5 bg-red-100 hover:bg-red-200 border-2 border-red-500 text-red-700 rounded-xl text-xs font-black transition shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer text-center"
               >
                 Delete My Account
               </button>
@@ -332,27 +332,27 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
 
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-2xl max-w-md w-full flex flex-col gap-4">
+          <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] max-w-md w-full flex flex-col gap-4 animate-slide-up">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-650 shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-red-100 border-2 border-gray-900 flex items-center justify-center text-red-650 shrink-0 text-xl shadow-[1px_1px_0px_rgba(0,0,0,1)]">
                 ⚠️
               </div>
               <div className="flex flex-col">
-                <h3 className="text-sm font-extrabold text-gray-800">
+                <h3 className="text-sm font-black text-gray-900 uppercase">
                   Delete Account Permanently?
                 </h3>
-                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] font-black text-red-600 uppercase tracking-wider mt-0.5">
                   This action is irreversible
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+            <p className="text-xs text-gray-600 font-bold leading-relaxed">
               Your account will be completely deleted, and all of your stored files will be permanently deleted from the database.
             </p>
 
             {deleteError && (
-              <p className="text-xs text-red-650 font-bold bg-red-50 p-2.5 rounded-lg border border-red-100">
+              <p className="text-xs text-red-650 font-black bg-red-50 p-2.5 rounded-lg border-2 border-red-500 shadow-[1px_1px_0px_rgba(0,0,0,1)]">
                 {deleteError}
               </p>
             )}
@@ -361,14 +361,14 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 border border-gray-250 bg-white hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 text-gray-900 rounded-xl text-xs font-black transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteAccount}
                 disabled={isDeleting}
-                className="px-5 py-2 bg-red-600 hover:bg-red-750 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-[0.98] cursor-pointer disabled:opacity-50 flex items-center justify-center min-w-[120px]"
+                className="px-5 py-2 bg-red-100 hover:bg-red-200 border-2 border-red-500 text-red-700 rounded-xl text-xs font-black transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer disabled:opacity-50 flex items-center justify-center min-w-[120px]"
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
               </button>
@@ -378,16 +378,16 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
       )}
       {showPasswordForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-2xl max-w-md w-full flex flex-col gap-4">
+          <div className="bg-white border-2 border-gray-900 rounded-2xl p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] max-w-md w-full flex flex-col gap-4 animate-slide-up">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-650 shrink-0 text-lg">
+              <div className="w-12 h-12 rounded-xl bg-[#CCFF00] border-2 border-gray-900 flex items-center justify-center text-gray-900 shrink-0 text-xl shadow-[1px_1px_0px_rgba(0,0,0,1)]">
                 🔑
               </div>
               <div className="flex flex-col">
-                <h3 className="text-sm font-extrabold text-gray-800">
+                <h3 className="text-sm font-black text-gray-900 uppercase">
                   Change Password
                 </h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mt-0.5">
                   Update account credentials
                 </p>
               </div>
@@ -395,13 +395,13 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
 
             <div className="flex flex-col gap-4 mt-2">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                   Current Password
                 </label>
                 <div className="relative">
                   <input
                     type={showCurrentPassword ? "text" : "password"}
-                    className="w-full h-9.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl pl-3 pr-10 outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                    className="w-full h-9.5 border-2 border-gray-900 bg-white focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] rounded-xl pl-3 pr-10 outline-none text-xs font-bold text-gray-900 transition-all"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
@@ -409,7 +409,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-900 focus:outline-none cursor-pointer"
                   >
                     {showCurrentPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                   </button>
@@ -417,13 +417,13 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                   New Password
                 </label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? "text" : "password"}
-                    className="w-full h-9.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl pl-3 pr-10 outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                    className="w-full h-9.5 border-2 border-gray-900 bg-white focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] rounded-xl pl-3 pr-10 outline-none text-xs font-bold text-gray-900 transition-all"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
@@ -431,7 +431,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-555 hover:text-gray-900 focus:outline-none cursor-pointer"
                   >
                     {showNewPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                   </button>
@@ -439,13 +439,13 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider">
+                <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider">
                   Confirm New Password
                 </label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full h-9.5 border border-gray-250 focus:ring-[#4A4D4A]/10 rounded-xl pl-3 pr-10 outline-none text-xs font-semibold text-gray-700 bg-gray-50/50 hover:bg-gray-50 focus:bg-white focus:border-[#4A4D4A] focus:ring-[3.5px] transition-all"
+                    className="w-full h-9.5 border-2 border-gray-900 bg-white focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] rounded-xl pl-3 pr-10 outline-none text-xs font-bold text-gray-900 transition-all"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
@@ -453,7 +453,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-555 hover:text-gray-900 focus:outline-none cursor-pointer"
                   >
                     {showConfirmPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                   </button>
@@ -461,8 +461,8 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
               </div>
             </div>
 
-            {passwordMessage && <p className="text-xs text-green-600 font-bold bg-green-50 p-2.5 rounded-lg border border-green-100">{passwordMessage}</p>}
-            {passwordError && <p className="text-xs text-red-650 font-bold bg-red-50 p-2.5 rounded-lg border border-red-100">{passwordError}</p>}
+            {passwordMessage && <p className="text-xs text-green-650 font-black bg-green-50 p-2.5 rounded-lg border-2 border-green-500 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]">{passwordMessage}</p>}
+            {passwordError && <p className="text-xs text-red-650 font-black bg-red-50 p-2.5 rounded-lg border-2 border-red-500 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)]">{passwordError}</p>}
 
             <div className="flex justify-end gap-3 mt-2">
               <button
@@ -472,14 +472,14 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
                   setPasswordError("");
                 }}
                 disabled={isUpdatingPassword}
-                className="px-4 py-2 border border-gray-250 bg-white hover:bg-gray-50 text-gray-700 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 border-2 border-gray-900 bg-white hover:bg-gray-50 text-gray-900 rounded-xl text-xs font-black transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdatePassword}
                 disabled={isUpdatingPassword}
-                className="px-5 py-2 bg-[#4A4D4A] hover:bg-[#2E302E] disabled:bg-[#4A4D4A]/50 text-white rounded-xl text-xs font-bold transition shadow-sm hover:shadow active:scale-[0.98] cursor-pointer disabled:opacity-50 min-w-[120px] flex items-center justify-center border-none outline-none"
+                className="px-5 py-2 bg-[#CCFF00] hover:bg-[#b5e000] disabled:opacity-50 border-2 border-gray-900 text-gray-900 rounded-xl text-xs font-black transition-all shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer disabled:opacity-50 min-w-[120px] flex items-center justify-center"
               >
                 {isUpdatingPassword ? "Updating..." : "Update Password"}
               </button>
