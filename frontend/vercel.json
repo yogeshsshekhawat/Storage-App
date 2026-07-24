@@ -2,7 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://yogeshshekhawat.in*"
+      "destination": "https://cloud.yogeshshekhawat.in/:path*"
+    },
+    {
+      "source": "/((?!api|static|.*\\.).*)",
+      "destination": "/index.html"
     }
   ]
 }
