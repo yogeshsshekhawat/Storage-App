@@ -19,11 +19,11 @@ const Trash = ({ url, data, getdata, active }) => {
         setShowConfirmModal(false);
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(errData.error || "Failed to empty trash.");
+        alert("An error occurred.");
       }
     } catch (err) {
       console.error("Empty trash error:", err);
-      alert("Network error occurred.");
+      alert("An error occurred.");
     } finally {
       setIsPending(false);
     }

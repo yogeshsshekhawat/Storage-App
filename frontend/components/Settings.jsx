@@ -56,10 +56,10 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
         setMessage("Profile updated successfully!");
         if (getdata) getdata();
       } else {
-        setError(result.error || "Failed to update profile");
+        setError("An error occurred.");
       }
     } catch (err) {
-      setError("Network error occurred.");
+      setError("An error occurred.");
     } finally {
       setIsSaving(false);
     }
@@ -82,10 +82,10 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
         window.location.href = "/";
       } else {
         const result = await res.json().catch(() => ({}));
-        setDeleteError(result.error || "Failed to delete account.");
+        setDeleteError("An error occurred.");
       }
     } catch (err) {
-      setDeleteError("Network error occurred.");
+      setDeleteError("An error occurred.");
     } finally {
       setIsDeleting(false);
     }
@@ -133,10 +133,10 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
         setConfirmPassword("");
         setTimeout(() => setShowPasswordForm(false), 2000);
       } else {
-        setPasswordError(result.error || "Failed to update password");
+        setPasswordError("An error occurred.");
       }
     } catch (err) {
-      setPasswordError("Network error occurred.");
+      setPasswordError("An error occurred.");
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -145,7 +145,7 @@ const Settings = ({ data, currentPlan, setShowUpgradeModal, url, getdata, handle
   const formattedLimit = formatBytes(storageLimitBytes);
 
   return (
-    <div className="w-full h-full overflow-y-auto hide-scrollbar bg-transparent">
+    <div className="w-full h-full overflow-y-auto hide-scrollbar bg-transparent p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto flex flex-col gap-5 pb-10">
 
         {/* Header */}

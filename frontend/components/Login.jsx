@@ -73,7 +73,7 @@ export default function Login() {
         console.log("Login successful:", data);
         window.location.href = "/drive";
       } else {
-        setErrors({ submit: data.message || "Login failed" });
+        setErrors({ submit: "An error occurred." });
       }
     } catch (error) {
       console.error("Login error:", error);

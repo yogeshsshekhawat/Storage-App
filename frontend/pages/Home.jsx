@@ -201,7 +201,7 @@ const Home = () => {
           setErrorPopup({
             show: true,
             title: isStorageError ? "Storage Limit Exceeded" : "Downgrade Failed",
-            message: errorData.error || "Failed to downgrade plan.",
+            message: "An error occurred.",
             buttonText: isStorageError ? "Manage Storage" : "Close",
             action: isStorageError ? () => { setActive("My Files"); setShowUpgradeModal(false); } : null
           });
@@ -211,7 +211,7 @@ const Home = () => {
         setErrorPopup({
           show: true,
           title: "Downgrade Error",
-          message: "Failed to downgrade plan due to a network error. Please try again.",
+          message: "An error occurred.",
           buttonText: "Close",
           action: null
         });
@@ -376,7 +376,7 @@ const Home = () => {
       setErrorPopup({
         show: true,
         title: isStorageError ? "Storage Limit Exceeded" : "Subscription Error",
-        message: error.message || "Failed to process plan change request.",
+        message: "An error occurred.",
         buttonText: isStorageError ? "Manage Storage" : "Close",
         action: isStorageError ? () => { setActive("My Files"); setShowUpgradeModal(false); } : null
       });
@@ -495,14 +495,14 @@ const Home = () => {
             xhrRef.current = null;
           }, 2000);
         } else {
-          console.error("S3 upload failed", xhr.statusText);
+          console.error("Upload failed");
           setuploading(false);
           setuploadfile([]);
           xhrRef.current = null;
           setErrorPopup({
             show: true,
             title: "Upload Failed",
-            message: "Upload to S3 failed. Please check your storage bucket configuration and CORS policy.",
+            message: "An error occurred.",
             buttonText: "Close",
             action: null
           });
@@ -510,14 +510,14 @@ const Home = () => {
       };
 
       xhr.onerror = () => {
-        console.error("S3 Upload network error");
+        console.error("Upload network error");
         setuploading(false);
         setuploadfile([]);
         xhrRef.current = null;
         setErrorPopup({
           show: true,
           title: "Network Error",
-          message: "Upload to S3 failed due to a network error. Ensure CORS is enabled on the S3 bucket.",
+          message: "An error occurred.",
           buttonText: "Close",
           action: null
         });
@@ -531,7 +531,7 @@ const Home = () => {
       setErrorPopup({
         show: true,
         title: "Upload Error",
-        message: "Failed to initialize upload: " + error.message,
+        message: "An error occurred.",
         buttonText: "Close",
         action: null
       });
@@ -714,7 +714,7 @@ const Home = () => {
         )}
 
         {/* Left Sidebar - Off-canvas Drawer on Mobile, Fixed on Desktop */}
-        <div className={`left fixed md:relative top-0 bottom-0 left-0 z-50 md:z-10 w-[240px] h-screen   p-4 flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        <div className={`left fixed md:relative top-0 bottom-0 left-0 z-50 md:z-10 w-[240px] h-screen bg-white md:bg-transparent border-r-2 border-gray-900 md:border-r-0 p-4 flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}>
           {/* Logo Block */}
           <div className="logo flex gap-2 h-14 items-center font-extrabold pl-2 text-gray-800 text-[15px] justify-between">

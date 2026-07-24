@@ -111,14 +111,14 @@ export default function VerifyEmail() {
           navigate('/drive');
         }, 1500);
       } else {
-        setError(data.message || 'Invalid verification code');
+        setError("An error occurred.");
         // Clear OTP on error
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       }
     } catch (error) {
       console.error('Verification error:', error);
-      setError('Something went wrong. Please try again.');
+      setError("An error occurred.");
     } finally {
       setLoading(false);
     }
@@ -151,11 +151,11 @@ export default function VerifyEmail() {
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
       } else {
-        setError(data.message || 'Failed to resend code');
+        setError("An error occurred.");
       }
     } catch (error) {
       console.error('Resend error:', error);
-      setError('Something went wrong. Please try again.');
+      setError("An error occurred.");
     } finally {
       setResending(false);
     }

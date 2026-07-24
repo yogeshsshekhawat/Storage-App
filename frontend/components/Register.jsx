@@ -85,7 +85,7 @@ export default function Register() {
         console.log("Registration successful:", data);
         navigate("/Verifyemail");
       } else {
-        setErrors({ submit: data.message || "Registration failed" });
+        setErrors({ submit: "An error occurred." });
       }
     } catch (error) {
       console.error("Registration error:", error);

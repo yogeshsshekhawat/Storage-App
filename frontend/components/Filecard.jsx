@@ -859,11 +859,11 @@ const Filecard = ({
                               setShareSuccess(`Shared with ${emailInput}`);
                               setEmailInput("");
                             } else {
-                              setShareError(data || "Failed to share file");
+                              setShareError("An error occurred.");
                             }
                           } catch (err) {
-                            console.error(err);
-                            setShareError("Server error. Please try again.");
+                            console.error("Error sharing file:", err);
+                            setShareError("An error occurred.");
                           }
                         }}
                       >
