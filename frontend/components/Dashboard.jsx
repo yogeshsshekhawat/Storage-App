@@ -58,7 +58,7 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
   const otherPercentage = storageLimitBytes ? (otherSize / storageLimitBytes) * 100 : 0;
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 bg-[#FAFAFA]/10 overflow-y-auto md:overflow-hidden pb-6 md:pb-0">
+    <div className="w-full h-full flex flex-col gap-4  overflow-y-auto md:overflow-hidden p-3 ">
 
       {/* Upgraded Premium Greeting Banner */}
       <div className="hidden md:flex w-full bg-[#2E302E] border-2 border-gray-900 rounded-2xl p-4 md:py-5 md:px-6 relative overflow-hidden shadow-[4px_4px_0px_rgba(0,0,0,1)] items-center justify-between text-white shrink-0">
@@ -159,9 +159,9 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
             Recent Files
           </h2>
 
-          <div className="w-full bg-white border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col h-full min-h-0 min-h-[300px]">
+          <div className="w-full   overflow-hidden flex flex-col h-full min-h-0 min-h-[300px]">
             {/* Table Header */}
-            <div className="bg-[#FAFAFA] border-b-2 border-gray-900 flex items-center h-10 px-4 text-[10.5px] font-black text-gray-900 select-none shrink-0 uppercase">
+            <div className="  flex items-center h-10 px-4 text-[10.5px] font-black text-gray-900 select-none shrink-0 uppercase">
               <div className="flex-1 md:w-[50%] pl-2">Name</div>
               <div className="hidden md:block w-[18%] text-center">Modified</div>
               <div className="hidden md:block w-[8%] text-center">Type</div>
@@ -193,7 +193,7 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
                 </button>
               </div>
             ) : (
-              <div className="flex-1 overflow-y-auto divide-y-2 divide-gray-900 hide-scrollbar">
+              <div className="flex-1 overflow-y-auto  hide-scrollbar pr-2">
                 {files.map((el) => {
                   return (
                     <Filecard
@@ -286,7 +286,7 @@ const Dashboard = ({ url, data, getdata, active, setActive }) => {
               Favorites
             </h2>
 
-            <div className="w-full bg-white border-2 border-gray-900 rounded-2xl p-4 shadow-[3px_3px_0px_rgba(0,0,0,1)] flex flex-col h-full min-h-0 flex-1">
+            <div className="w-full bg-white border-2 border-gray-900 rounded-2xl p-4 shadow-[3px_3px_0px_rgba(0,0,0,1)] flex flex-col  min-h-0 flex-1">
               {favorite.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
                   <h3 className="text-xs font-black text-gray-900 uppercase">No favorites yet</h3>

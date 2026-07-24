@@ -90,7 +90,7 @@ const Navbar = ({ data, getdata, url, setActive, setIsMobileMenuOpen }) => {
 
   return (
     <>
-      <div className="w-full h-16 border-b-2 border-gray-900 bg-white flex items-center justify-between px-3 md:px-6 shrink-0 relative z-20 gap-3">
+      <div className="w-full h-16   flex items-center justify-between px-3 md:px-6 shrink-0 relative z-20 gap-3">
         {/* Mobile Sidebar Toggle Button */}
         <button
           onClick={() => setIsMobileMenuOpen && setIsMobileMenuOpen((prev) => !prev)}
@@ -108,7 +108,7 @@ const Navbar = ({ data, getdata, url, setActive, setIsMobileMenuOpen }) => {
           <input
             type="text"
             placeholder="Search files, folders..."
-            className="w-full h-9.5 pl-10 pr-4 py-2 border-2 border-gray-900 rounded-xl outline-none bg-white text-xs font-bold text-gray-900 transition-all focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px]"
+            className="w-full h-9.5 pl-10 pr-4 py-2 border-2 border-gray-900 rounded-xl outline-none bg-white text-xs font-bold text-gray-900 transition-all shadow-[3px_3px_0px_rgba(0,0,0,1)] focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px]"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => {

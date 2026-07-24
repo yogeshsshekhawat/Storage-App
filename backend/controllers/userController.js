@@ -57,7 +57,7 @@ export const userRegister = async (req, res) => {
   const { success, data, error } = registerSchema.safeParse(req.body)
 
   if (!success) {
-    res.status(400).json({ error: "invalid credentials" });
+    return res.status(400).json({ error: "invalid credentials" });
   }
   const { name, email, password } = data;
   const { sid } = req.signedCookies;
@@ -67,8 +67,8 @@ export const userRegister = async (req, res) => {
     return res.json("already login");
   }
 
-  const a = await user.insertOne({ name, email, password });
-  const b = await directory.insertOne({ name: "root", userid: a.id });
+  const a = await user.create({ name, email, password });
+  const b = await directory.create({ name: "root", userid: a._id });
   
   let session;
   if (sid) {
@@ -86,7 +86,7 @@ export const userRegister = async (req, res) => {
   }
   const otp = Math.floor(100000 + Math.random() * 900000);
 
-  await Otp.insertOne({ userid: a.id, otp });
+  await Otp.create({ userid: a._id, otp });
 
   await sendotp(email, otp);
 
@@ -118,6 +118,13 @@ export const userLogin = async (req, res) => {
       if (session) {
         await setCachedSession(session._id, session);
       }
+
+      // Ensure root directory exists
+      const rootDir = await directory.findOne({ userid: a._id, name: "root" });
+      if (!rootDir) {
+        await directory.create({ name: "root", userid: a._id });
+      }
+
       res.cookie("sid", session._id, {
         signed: true,
         sameSite: "none",
@@ -198,6 +205,13 @@ export const userGoogleregister = async (req, res) => {
       session = await Session.create({ userid: User._id });
     }
     await setCachedSession(session._id, session);
+
+    // Ensure root directory exists
+    const rootDir = await directory.findOne({ userid: User._id, name: "root" });
+    if (!rootDir) {
+      await directory.create({ name: "root", userid: User._id });
+    }
+
     res.cookie("sid", session._id, {
       signed: true,
       sameSite: "none",
@@ -214,7 +228,7 @@ export const userGoogleregister = async (req, res) => {
       profilepic: picture,
       isVerified: true,
     });
-    const b = await directory.insertOne({ name: "root", userid: newuser.id });
+    const b = await directory.create({ name: "root", userid: newuser._id });
     let session;
     if (sid) {
       session = await Session.findByIdAndUpdate(

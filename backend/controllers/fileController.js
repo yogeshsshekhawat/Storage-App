@@ -88,21 +88,21 @@ export const postfile = async (req, res) => {
 
   const { filename } = req.params;
   const extention = path.extname(filename);
-  const files = await file.insertOne({
+  const files = await file.create({
     name: filename,
     userid: id,
-    parentid: parentid.id,
+    parentid: parentid._id,
     ext: extention,
     size: size,
   });
 
   try {
-    const s3Key = `${files.id}${extention}`;
+    const s3Key = `${files._id}${extention}`;
     const uploadUrl = await getPresignedUploadUrl(s3Key, contenttype || "application/octet-stream");
     res.json({ uploadUrl, file: files });
   } catch (err) {
     console.error("Error generating presigned URL:", err);
-    await file.deleteOne({ _id: files.id });
+    await file.deleteOne({ _id: files._id });
     res.status(500).json({ message: "Failed to generate upload URL" });
   }
 }

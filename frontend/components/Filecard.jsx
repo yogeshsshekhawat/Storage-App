@@ -814,11 +814,11 @@ const Filecard = ({
                     <label className="text-[10px] font-black text-gray-900 uppercase tracking-wider pl-0.5 animate-fade-in">
                       Share with email
                     </label>
-                    <div className="flex gap-2 w-full">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full">
                       <input
                         type="email"
                         placeholder="user@example.com"
-                        className="flex-1 px-3 py-2.5 border-2 border-gray-900 bg-white rounded-xl text-xs font-bold outline-none text-gray-900 focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] transition-all"
+                        className="w-full sm:flex-1 px-3 py-2.5 border-2 border-gray-900 bg-white rounded-xl text-xs font-bold outline-none text-gray-900 focus:shadow-[2px_2px_0px_rgba(0,0,0,1)] focus:translate-x-[-1px] focus:translate-y-[-1px] transition-all"
                         value={emailInput}
                         onChange={(e) => {
                           setEmailInput(e.target.value);
@@ -827,7 +827,7 @@ const Filecard = ({
                         }}
                       />
                       <select
-                        className="px-2 border-2 border-gray-900 bg-white rounded-xl text-xs font-black outline-none text-gray-900 cursor-pointer"
+                        className="w-full sm:w-auto px-2 py-2.5 border-2 border-gray-900 bg-white rounded-xl text-xs font-black outline-none text-gray-900 cursor-pointer"
                         value={permissionInput}
                         onChange={(e) => setPermissionInput(e.target.value)}
                       >
@@ -835,7 +835,7 @@ const Filecard = ({
                         <option value="edit">Can Edit</option>
                       </select>
                       <button
-                        className="px-4 bg-[#CCFF00] hover:bg-[#b5e000] text-gray-900 border-2 border-gray-900 rounded-xl text-xs font-black transition shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shrink-0 active:scale-[0.98] cursor-pointer"
+                        className="w-full sm:w-auto px-4 py-2.5 bg-[#CCFF00] hover:bg-[#b5e000] text-gray-900 border-2 border-gray-900 rounded-xl text-xs font-black transition shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] shrink-0 active:scale-[0.98] cursor-pointer"
                         onClick={async () => {
                           if (!emailInput.trim()) {
                             setShareError("Please enter an email address");

@@ -714,9 +714,8 @@ const Home = () => {
         )}
 
         {/* Left Sidebar - Off-canvas Drawer on Mobile, Fixed on Desktop */}
-        <div className={`left fixed md:relative top-0 bottom-0 left-0 z-50 md:z-10 w-[240px] h-screen border-r-2 border-gray-900 bg-white shadow-[4px_0px_0px_rgba(0,0,0,1)] p-4 flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}>
+        <div className={`left fixed md:relative top-0 bottom-0 left-0 z-50 md:z-10 w-[240px] h-screen   p-4 flex flex-col shrink-0 transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          }`}>
           {/* Logo Block */}
           <div className="logo flex gap-2 h-14 items-center font-extrabold pl-2 text-gray-800 text-[15px] justify-between">
             <div className="flex items-center gap-2">
@@ -1015,11 +1014,11 @@ const Home = () => {
         </div>
 
         {/* Right Area - Flex-1 wrapper */}
-        <div className="right flex-1 flex flex-col h-screen min-w-0 relative z-10">
+        <div className="right flex-1 flex flex-col   h-screen min-w-0 relative z-10">
           <Navbar data={data} getdata={getdata} url={url} setShowUpgradeModal={setShowUpgradeModal} setActive={setActive} setIsMobileMenuOpen={setIsMobileMenuOpen} />
 
           {/* Content Pane */}
-          <div className="flex-1 overflow-y-auto bg-gray-50/30 p-3 sm:p-6">
+          <div className="flex-1 overflow-y-auto bg-gray-50/30  ">
             {active === "dashboard" && (
               <Dashboard
                 url={url}

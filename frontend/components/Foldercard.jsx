@@ -285,9 +285,9 @@ const Foldercard = ({
             </div>
           </div>
 
-          {/* Option Menu Button (Fades in on hover) */}
+          {/* Option Menu Button (Fades in on hover on desktop, always visible on mobile) */}
           <div
-            className="absolute top-2.5 right-2.5 w-7 h-7 border-2 border-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] bg-white rounded-lg flex items-center justify-center text-gray-900 hover:bg-gray-150 transition-all duration-200 cursor-pointer opacity-0 group-hover:opacity-100"
+            className="absolute top-2.5 right-2.5 w-7 h-7 border-2 border-gray-900 shadow-[1.5px_1.5px_0px_rgba(0,0,0,1)] bg-white rounded-lg flex items-center justify-center text-gray-900 hover:bg-gray-150 transition-all duration-200 cursor-pointer opacity-100 md:opacity-0 group-hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
               setoptionmenu(optionmenu ? false : true);

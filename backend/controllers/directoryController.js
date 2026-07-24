@@ -192,17 +192,17 @@ export const postdir = async (req, res) => {
   const { foldername } = req.body;
 
   if (id != "root") {
-    await directory.insertOne({
+    await directory.create({
       name: foldername,
       userid: userid,
       parentid: id,
     });
   } else {
     const parent = await directory.findOne({ userid: userid, name: "root" });
-    await directory.insertOne({
+    await directory.create({
       name: foldername,
       userid: userid,
-      parentid: parent.id,
+      parentid: parent._id,
     });
   }
 
