@@ -269,7 +269,7 @@ export default function LandingPage() {
     },
     {
       q: "How secure is my data?",
-      a: "All connections run over TLS 1.3 encryption with presigned AWS S3 download credentials and secure session cookies."
+      a: "All connections run over TLS 1.3 encryption with secure download credentials and secure session cookies."
     }
   ];
 
@@ -621,7 +621,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-1.5 text-gray-600">
               <span className="text-lg">☁️</span>
-              <span className="text-[11px] font-black tracking-wide">AWS S3</span>
+              <span className="text-[11px] font-black tracking-wide">Cloud Storage</span>
             </div>
             <div className="flex items-center gap-1.5 text-gray-600">
               <span className="text-lg">🔐</span>
@@ -1369,7 +1369,7 @@ export default function LandingPage() {
 
               {/* Tech stack mini badges */}
               {/* <div className="flex flex-wrap gap-2 mb-5">
-                {["React", "Node.js", "MongoDB", "AWS S3"].map((tech) => (
+                {["React", "Node.js", "MongoDB", "Cloud Storage"].map((tech) => (
                   <span
                     key={tech}
                     className="px-2.5 py-1 bg-white border-2 border-gray-900 shadow-[2px_2px_0px_rgba(0,0,0,1)] rounded-full text-[9px] font-black text-gray-800 uppercase tracking-wider"
@@ -1407,8 +1407,8 @@ export default function LandingPage() {
               {
                 title: "Legal",
                 links: [
-                  { text: "Privacy Policy", href: "#" },
-                  { text: "Terms of Service", href: "#" },
+                  { text: "Privacy Policy", href: "/privacy-policy" },
+                  { text: "Terms of Service", href: "/terms-of-service" },
                   { text: "Cookie Settings", href: "#" },
                   { text: "FAQ", href: "#faq" },
                 ],
@@ -1421,12 +1421,21 @@ export default function LandingPage() {
                 <ul className="flex flex-col gap-3">
                   {col.links.map((link) => (
                     <li key={link.text}>
-                      <a
-                        href={link.href}
-                        className="text-[11.5px] font-bold text-gray-400 hover:text-gray-900 transition-colors"
-                      >
-                        {link.text}
-                      </a>
+                      {link.href.startsWith("/") ? (
+                        <Link
+                          to={link.href}
+                          className="text-[11.5px] font-bold text-gray-400 hover:text-gray-900 transition-colors"
+                        >
+                          {link.text}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          className="text-[11.5px] font-bold text-gray-400 hover:text-gray-900 transition-colors"
+                        >
+                          {link.text}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>

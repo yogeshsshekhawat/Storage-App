@@ -7,6 +7,8 @@ import Register from "../components/Register";
 import LandingPage from "./LandingPage";
 import VerifyEmail from "../components/VerifyEmail";
 import Home from "../pages/Home";
+import PrivacyPolicy from "../components/PrivacyPolicy";
+import TermsOfService from "../components/TermsOfService";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 let router = createBrowserRouter([
@@ -33,6 +35,22 @@ let router = createBrowserRouter([
   {
     path: "/directory/:dirId",
     Component: Home,
+  },
+  {
+    path: "/privacy-policy",
+    Component: PrivacyPolicy,
+  },
+  {
+    path: "/privacy",
+    Component: PrivacyPolicy,
+  },
+  {
+    path: "/terms-of-service",
+    Component: TermsOfService,
+  },
+  {
+    path: "/terms",
+    Component: TermsOfService,
   },
 ]);
 
