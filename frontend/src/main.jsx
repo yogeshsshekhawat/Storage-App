@@ -9,6 +9,7 @@ import VerifyEmail from "../components/VerifyEmail";
 import Home from "../pages/Home";
 import PrivacyPolicy from "../components/PrivacyPolicy";
 import TermsOfService from "../components/TermsOfService";
+import AboutUs from "../components/AboutUs";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 let router = createBrowserRouter([
@@ -51,6 +52,14 @@ let router = createBrowserRouter([
   {
     path: "/terms",
     Component: TermsOfService,
+  },
+  {
+    path: "/about-us",
+    Component: AboutUs,
+  },
+  {
+    path: "/about",
+    Component: AboutUs,
   },
 ]);
 

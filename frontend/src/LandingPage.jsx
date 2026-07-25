@@ -1398,7 +1398,7 @@ export default function LandingPage() {
               {
                 title: "Company",
                 links: [
-                  { text: "About Us", href: "#" },
+                  { text: "About Us", href: "/about-us" },
                   { text: "Careers", href: "#" },
                   { text: "Blog", href: "#" },
                   { text: "Contact", href: "#" },
