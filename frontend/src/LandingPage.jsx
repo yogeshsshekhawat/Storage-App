@@ -339,6 +339,12 @@ export default function LandingPage() {
           >
             FAQ
           </a>
+          <Link
+            to="/about-us"
+            className="text-[11px] font-black px-4 py-1.5 rounded-full transition-all duration-300 uppercase tracking-wider text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+          >
+            About Us
+          </Link>
         </div>
 
         {/* Desktop Auth CTA - Neo-Brutalist Buttons */}
@@ -410,6 +416,13 @@ export default function LandingPage() {
             >
               FAQ
             </a>
+            <Link
+              to="/about-us"
+              onClick={() => setMobileNavOpen(false)}
+              className="text-sm font-black text-gray-700 py-1.5 uppercase tracking-wider"
+            >
+              About Us
+            </Link>
             <div className="pt-3 border-t-2 border-gray-900 flex flex-col gap-2.5">
               <Link
                 to="/login"
@@ -572,7 +585,7 @@ export default function LandingPage() {
 
           {/* Slanted lime badge — matching section heading design */}
           <div className="inline-block bg-[#CCFF00] border-2 border-gray-900 shadow-[3px_3px_0px_rgba(0,0,0,1)] rotate-[-1deg] text-[10.5px] md:text-xs font-black uppercase text-gray-800 px-5 py-2 rounded-full select-none mb-6 hover:rotate-0 transition-transform">
-            SAAS 2.0 CLOUD VAULT IS LIVE
+            SAAS 2.0 CLOUDVAULT IS LIVE
           </div>
 
           {/* Subtitle */}
