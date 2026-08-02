@@ -274,16 +274,16 @@ export default function AboutUs() {
                 </tr>
                 <tr className="bg-[#FAFAFA]">
                   <td className="p-4 border-r-2 border-gray-900 font-mono text-[10.5px] text-gray-900">
-                    https://www.googleapis.com/auth/drive.readonly
+                    https://www.googleapis.com/auth/drive.file
                   </td>
                   <td className="p-4 border-r-2 border-gray-900 font-extrabold text-gray-900 text-purple-600">
-                    Google Drive Read-Only Scope
+                    Google Drive File Access Scope
                   </td>
                   <td className="p-4 border-r-2 border-gray-900 text-gray-500">
-                    Read-only access to browse and copy files stored on your Google Drive.
+                    Access to browse and copy only the specific files you explicitly select via the Picker.
                   </td>
                   <td className="p-4 text-gray-500 leading-relaxed">
-                    Triggered exclusively on-demand when you click "Import from Drive" within the dashboard. This launches the secure, client-side **Google Drive Picker API overlay**. CloudVault **only** downloads the specific document or folder you explicitly click and authorize. We have no background, permanent, or write access to your Drive files.
+                    Triggered exclusively on-demand when you click "Import from Drive" within the dashboard. This launches the secure, client-side **Google Drive Picker API overlay**. CloudVault **only** downloads the specific document or folder you explicitly click and authorize. We have no background, permanent, or write access to your other Drive files.
                   </td>
                 </tr>
               </tbody>

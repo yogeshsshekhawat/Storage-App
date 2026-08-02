@@ -682,7 +682,7 @@ const Home = () => {
     if (window.google) {
       tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
         client_id: clientId,
-        scope: "https://www.googleapis.com/auth/drive.readonly",
+        scope: "https://www.googleapis.com/auth/drive.file",
         callback: (response) => {
           accessTokenRef.current = response.access_token;
           createPicker(); // open picker after auth
