@@ -107,6 +107,7 @@ const Home = () => {
   const tokenClientRef = useRef(null);
   const accessTokenRef = useRef(null);
   const clientId = import.meta.env.VITE_FRONTNED_CLIENT_ID;
+  const appId = clientId ? clientId.split("-")[0] : "";
   const [active, setActive] = useState(() => {
     return localStorage.getItem("activeTab") || "dashboard";
   });
@@ -572,6 +573,7 @@ const Home = () => {
 
     window.gapi.load("picker", () => {
       const picker = new window.google.picker.PickerBuilder()
+        .setAppId(appId)
         .addView(window.google.picker.ViewId.DOCS)
         .addView(window.google.picker.ViewId.FOLDERS)
         .setOAuthToken(accessTokenRef.current)
