@@ -12,7 +12,8 @@ import { verifyIdToken } from "../service/googleAuthService.js";
 import z from "zod";
 import { registerSchema } from "../validator/Zod_Validator.js";
 import { setCachedSession, deleteCachedSession, getCachedSession } from "../config/redisService.js";
-
+const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
+const COOKIE_SAMESITE = process.env.COOKIE_SAMESITE || "lax";
 
 export const userSession = async (req, res) => {
   const { sid } = req.signedCookies;
@@ -21,8 +22,8 @@ export const userSession = async (req, res) => {
     await setCachedSession(newsession._id, newsession);
     res.cookie("sid", newsession._id, {
       signed: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: COOKIE_SAMESITE,
+      secure: COOKIE_SECURE,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -36,8 +37,8 @@ export const userSession = async (req, res) => {
     await setCachedSession(newsession._id, newsession);
     res.cookie("sid", newsession._id, {
       signed: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: COOKIE_SAMESITE,
+      secure: COOKIE_SECURE,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -92,8 +93,8 @@ export const userRegister = async (req, res) => {
 
   res.cookie("sid", session._id, {
     signed: true,
-    sameSite: "none",
-    secure: true,
+    sameSite: COOKIE_SAMESITE,
+    secure: COOKIE_SECURE,
     httpOnly: true,
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
@@ -127,8 +128,8 @@ export const userLogin = async (req, res) => {
 
       res.cookie("sid", session._id, {
         signed: true,
-        sameSite: "none",
-        secure: true,
+        sameSite: COOKIE_SAMESITE,
+        secure: COOKIE_SECURE,
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
@@ -214,8 +215,8 @@ export const userGoogleregister = async (req, res) => {
 
     res.cookie("sid", session._id, {
       signed: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: COOKIE_SAMESITE,
+      secure: COOKIE_SECURE,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -243,8 +244,8 @@ export const userGoogleregister = async (req, res) => {
     await setCachedSession(session._id, session);
     res.cookie("sid", session._id, {
       signed: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: COOKIE_SAMESITE,
+      secure: COOKIE_SECURE,
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });

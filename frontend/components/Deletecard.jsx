@@ -128,7 +128,7 @@ const Deletecard = ({ el, getdata, active }) => {
       <div className="w-[25%] flex items-center justify-center text-[10px] font-black text-gray-550 capitalize truncate px-2">
         <span className="truncate">
           📁 &nbsp;/&nbsp;
-          {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
+          {Array.isArray(el?.path) ? el.path.map((p) => p.name).join(" / ") : ""}
         </span>
       </div>
 
@@ -273,10 +273,10 @@ const Deletecard = ({ el, getdata, active }) => {
               <div className="bg-[#FAFAFA] border-2 border-gray-900 p-2.5 rounded-lg text-xs font-black text-gray-950 truncate max-w-full">
                 {el.name}
               </div>
-              <div className="text-[11px] font-bold text-gray-500 flex items-center gap-1">
+              <div className="text-[11px] font-bold text-gray-550 flex items-center gap-1">
                 <span>Location:</span>
                 <span className="font-black text-gray-900 uppercase">
-                  📁 / {Array.isArray(el?.path) ? el.path.join(" / ") : ""}
+                  📁 / {Array.isArray(el?.path) ? el.path.map((p) => p.name).join(" / ") : ""}
                 </span>
               </div>
             </div>
